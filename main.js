@@ -1,21 +1,52 @@
 'use strict'
 
+function initialiseEditor (editorEl) {
+  let inJsEl = editorEl.querySelector('.editor-in-js')
+  let outPrettyEl = editorEl.querySelector('.editor-out-pretty')
+  let statusEl = editorEl.querySelector('.editor-status')
+
+  statusEl.innerText = 'Initialising'
+
+  const parseAndCompile = js => {
+    statusEl.innerText = 'Parsing'
+    try {
+      let ast = compile(js)
+      outPrettyEl.innerText = PP.print(ast)
+      statusEl.innerText = 'Idle'
+    } catch (e) {
+      statusEl.innerText = 'Error: ' + e
+    }
+  }
+
+  inJsEl.addEventListener('input', () => {
+    parseAndCompile(inJsEl.value)
+  })
+
+  parseAndCompile(inJsEl.value)
+}
+
 function runTests (test) {
   var test1 =
     ap(
       lam('x', bin('*', 'x', l(8))),
       bin('+', l(4), l(5)))
 
-  var test2 = lam('ast',
-    lets(
+  var test2 =
+    lam('ast', lets(
+
       'translate', lam('ast',
         caseof('ast.type',
           l('literal'), ap('JSON.stringify', 'ast.value'),
           l('variable'), v('ast.id'),
+
           l('binary'), ap(ap('Array$join', bin('+', l(' '), 'ast.op', l(' '))), ap('ast.args.map', lam('a', ap('translateP', 'a')))),
+
           l('lambda'), bin('+', l('function('), 'ast.arg', l('){return '), ap('translate', 'ast.value'), l('}')),
+
           l('apply'), bin('+', ap('translateP', 'ast.fn'), l('('), ap('translate', 'ast.arg'), l(')')),
+
           l('let'), bin('+', l('(function(){var '), 'ast.binding', l(' = '), ap('translate', 'ast.value'), l('; return '), ap('translate', 'ast.result'), l('})()')),
+
           l('let+'), bin('+',
             l('(function(){'),
             ap('foldR',
@@ -24,6 +55,7 @@ function runTests (test) {
               bin('+', l('return '), ap('translate', 'ast.result')),
               'ast.bindings'),
             l('})()')),
+
           l('pattern'), lets(
             'casesBlock',
               ap('foldR',
@@ -39,12 +71,14 @@ function runTests (test) {
                 'ast.cases'),
             bin('+', l('(function(_$m){return '), 'casesBlock', l('})('), ap('translate', 'ast.arg'), l(')')))
         )),
+
       'translateP', lam('ast',
         caseof('ast.type',
           l('lambda'), bin('+', l('('), ap('translate', 'ast'), l(')')),
           l('binary'), bin('+', l('('), ap('translate', 'ast'), l(')')),
           any(), ap('translate', 'ast')
         )),
+
       ap('translate', ap('scrollLets', ap('sugarifyLet', 'ast')))))
 
   // TODO: accumulate nested Apply, Lets, Lambda args
@@ -324,13 +358,11 @@ var PP = {
           if (isMultiline(result)) result = [newline(), indent(result)]
           result = [result, newline()]
           switch (c[0].type) {
-            case 'any': return [kw('_'), kw('->'), result]
-            case 'literal': return [lit(c[0].value), kw('->'), result]
-            default: return [kw('UNKNOWN_CASE'), kw('->'), result]
+            case 'any': return [kw('_'), kw('→'), result]
+            case 'literal': return [lit(c[0].value), kw('→'), result]
+            default: return [kw('UNKNOWN_CASE'), kw('→'), result]
           }
         })
-        // let fn = this._layout(ast.fn)
-        // let arg = parensIf(this._layout(ast.arg), ast.arg, 'apply')
         if (isMultiline(arg)) {
           return [kw('case'), newline(), indent(arg), newline(), kw('of'), newline(), indent(cases)]
         } else {
@@ -537,6 +569,9 @@ function foldR (fn) {
   }
 }
 
-runTests()
+window.addEventListener('load', () => {
+  runTests()
+  initialiseEditor(document.querySelector('.editor'))
+})
 
 foldR; Array$join; Fn$bind1; _$throw

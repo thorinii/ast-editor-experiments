@@ -4,5 +4,44 @@
     <script src="main.js" type="application/javascript"></script>
   </head>
   <body>
+    <div class="editor">
+      <div class="message editor-status">Idle</div>
+
+      <div class="container container-2-colums">
+        <div class="pane">
+          <textarea class="code editor-in-js"></textarea>
+        </div>
+        <div class="pane">
+          <div class="code-text editor-out-pretty"></div>
+        </div>
+      </div>
+    </div>
+
+    <style>
+      .container {
+        height: 100%;
+      }
+
+      .container-2-colums {
+        display: flex;
+        flex-direction: row;
+      }
+      .container-2-colums .pane {
+        flex-basis: 0;
+        flex-grow: 1;
+        height: 100%;
+        padding: 10px;
+      }
+
+      textarea.code {
+        width: 100%;
+        height: 100%;
+      }
+
+      .code-text {
+        font-family: monospace;
+        white-space: pre;
+      }
+    </style>
   </body>
 </html>
