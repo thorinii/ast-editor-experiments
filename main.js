@@ -1,7 +1,6 @@
 'use strict'
 
 function runTests (test) {
-  // (\x -> x * 8)(4 + 5)
   var test1 =
     ap(
       lam('x', bin('*', 'x', l(8))),
@@ -50,36 +49,44 @@ function runTests (test) {
 
   // TODO: accumulate nested Apply, Lets, Lambda args
 
-  console.log('TEST 1: simple lambdas and application')
-  console.log(pretty(test1))
-  console.log(PP.print(test1))
-  console.log(PP2.print(test1))
-  console.log(Bootstrap.translate(test1))
-  var compiled1 = compile(Bootstrap.translate(test1))
-  console.log(compiled1)
-  console.log('->  ' + (compiled1 === 72 ? 'SUCCESS' : 'FAILED'))
-
-  console.log('TEST 2: a JS translator')
-  console.log(PP.print(test2))
-  console.log(PP2.print(test2))
-  console.log(Bootstrap.translate(test2))
-  var compiled2 = compile(Bootstrap.translate(test2))
-  var result2_1 = compiled2(test1)
-  var result2_2 = compiled2(test2)
-  console.log(result2_1)
-  console.log('->  ' + compile(result2_1) + '  ' + (compile(result2_1) === compiled1 ? 'SUCCESS' : 'FAILED'))
-  console.log(result2_2)
-  console.log('->  ' + compile(result2_2)(test1))
-
-  console.log('TEST 3: a JS translator translated five times')
-  let deTranslata = Bootstrap.translate.bind(Bootstrap)
-  let initialJs = deTranslata(test2)
-  for (let i = 0; i < 5; i++) {
-    let result = deTranslata(test2)
-    deTranslata = compile(result)
+  {
+    console.log('TEST 1: simple lambdas and application')
+    console.log(PP.print(test1))
+    console.log(Bootstrap.translate(test1))
+    let compiled = compile(Bootstrap.translate(test1))
+    console.log(compiled)
+    console.log('->  ' + (compiled === 72 ? 'SUCCESS' : 'FAILED'))
   }
-  let finalJs = deTranslata(test2)
-  console.log('->  ' + (finalJs === initialJs ? 'SUCCESS' : 'FAILED'))
+
+  {
+    console.log('TEST 2: a JS translator')
+    console.log(PP.print(test2))
+    console.log(Bootstrap.translate(test2))
+    let testTranslateJs = Bootstrap.translate(test2)
+    let testTranslate = compile(testTranslateJs)
+
+    console.log('Can compile Test 1?')
+    let resultTest1 = testTranslate(test1)
+    let expectedTest1 = Bootstrap.translate(test1)
+    console.log('->  ' + (resultTest1 === expectedTest1 ? 'SUCCESS' : 'FAILED'))
+
+    console.log('Can compile itself?')
+    let resultTest2 = testTranslate(test2)
+    let expectedTest2 = testTranslateJs
+    console.log('->  ' + (resultTest2 === expectedTest2 ? 'SUCCESS' : 'FAILED'))
+  }
+
+  {
+    console.log('TEST 3: a JS translator translated five times')
+    let deTranslata = Bootstrap.translate.bind(Bootstrap)
+    let initialJs = deTranslata(test2)
+    for (let i = 0; i < 5; i++) {
+      let result = deTranslata(test2)
+      deTranslata = compile(result)
+    }
+    let finalJs = deTranslata(test2)
+    console.log('->  ' + (finalJs === initialJs ? 'SUCCESS' : 'FAILED'))
+  }
 }
 
 var Bootstrap = {
@@ -240,99 +247,6 @@ var scrollLets = rewriteAstTopFirst(ast => {
 })
 
 var PP = {
-  print: function (ast) {
-    var blocks = this.toBlocks(scrollLets(sugarifyLet(ast)))
-    return this.render(blocks)
-  },
-
-  toBlocks: function (ast) {
-    switch (ast.type) {
-      case 'literal':
-        return [JSON.stringify(ast.value)]
-
-      case 'variable':
-        return [ast.id]
-
-      case 'binary':
-        return [ast.op, ...ast.args.map(arg => this.toBlocks(arg))]
-
-      case 'lambda':
-        return ['\\' + ast.arg + '->', this.toBlocks(ast.value)]
-
-      case 'apply':
-        return [this.toBlocks(ast.fn), this.toBlocks(ast.arg)]
-
-      case 'let':
-        return [
-          'let',
-          [ast.binding, '=', this.toBlocks(ast.value)],
-          'in',
-          this.toBlocks(ast.result)]
-
-      case 'let+':
-        return [
-          'let',
-          ...ast.bindings.map(b => [b[0], '=', this.toBlocks(b[1])]),
-          'in',
-          this.toBlocks(ast.result)]
-
-      case 'pattern':
-        return [
-          ['case', this.toBlocks(ast.arg), 'of'],
-          ...ast.cases.map(c => {
-            let condition
-            switch (c[0].type) {
-              case 'any': condition = '_'; break
-              case 'literal': condition = JSON.stringify(c[0].value); break
-              default: condition = 'UNKNOWN'; break
-            }
-            return [condition + '->', this.toBlocks(c[1])]
-          })
-        ]
-
-      default:
-        console.error('Unknown AST type:', ast.type, ast)
-        return 'UNKNOWN'
-    }
-  },
-
-  render: function (block) {
-    var rendered = this.renderToRendered(block)
-    return rendered.string
-  },
-
-  renderToRendered: function (block) {
-    if (Array.isArray(block)) {
-      let pieces = block.map(itm => this.renderToRendered(itm))
-      let totalFlatLength = pieces.map(p => p.string).join(' ').length
-      let multiline = !!pieces.find(p => p.multiline) || pieces.length > 7 || totalFlatLength > 60
-      let string
-      if (multiline) {
-        string = pieces.map((p, idx) => idx > 0 ? this.indent(p.string) : p.string).join('\n')
-      } else {
-        string = pieces.map(p => p.string.indexOf(' ') >= 0 ? '(' + p.string + ')' : p.string)
-                       .join(' ')
-      }
-      return {string: string, multiline: multiline}
-    } else {
-      return {string: block, multiline: block.indexOf('\n') >= 0}
-    }
-  },
-
-  flattenToString: function (block) {
-    if (!Array.isArray(block)) return block
-    if (block.length === 1) return this.flattenToString(block[0])
-    return '[' +
-           block.map(itm => this.flattenToString(itm)).join(', ') +
-           ']'
-  },
-
-  indent: function (string) {
-    return '  ' + string.split('\n').join('\n  ')
-  }
-}
-
-var PP2 = {
   print: function (ast) {
     let layout = this._layout(scrollLets(sugarifyLet(ast)))
     let rows = this._flatten(layout)
@@ -523,46 +437,6 @@ var PP2 = {
       if (acc.length > 0) acc += '\n'
       return acc + renderRow(row)
     }, '')
-  }
-}
-
-function pretty (ast) {
-  switch (ast.type) {
-    case 'literal': return JSON.stringify(ast.value)
-    case 'variable': return ast.id
-    case 'binary': return ast.args.map(function (a) { return prettyP(a) }).join(' ' + ast.op + ' ')
-    case 'lambda': return '\\' + ast.arg + ' -> ' + pretty(ast.value)
-
-    case 'let':
-      return 'let ' + ast.binding + ' = ' + pretty(ast.value) + ' in ' + pretty(ast.result)
-
-    case 'apply':
-      return prettyP(ast.fn) + ' ' + prettyP(ast.arg)
-
-    case 'pattern':
-      return 'case ' + prettyP(ast.arg) + ' of ' + ast.cases.map(function (c) {
-        let condition
-        switch (c[0].type) {
-          case 'any': condition = '_'; break
-          case 'literal': condition = JSON.stringify(c[0].value); break
-          default: condition = 'UNKNOWN'; break
-        }
-        return condition + ' -> ' + pretty(c[1])
-      }).join(' ; ')
-
-    default:
-      console.error('Unknown AST type:', ast.type, ast)
-      return 'UNKNOWN'
-  }
-}
-
-function prettyP (ast) {
-  switch (ast.type) {
-    case 'lambda':
-    case 'binary':
-      return '(' + pretty(ast) + ')'
-    default:
-      return pretty(ast)
   }
 }
 
