@@ -12,14 +12,19 @@
           <textarea class="code editor-in-js"></textarea>
         </div>
         <div class="pane">
-          <div class="code-text editor-out-pretty"></div>
+          <div class="code-text editor-out-live"></div>
         </div>
       </div>
+
+      <div class="code-text editor-out-pretty"></div>
     </div>
 
     <style>
+      div, * {
+        box-sizing: border-box;
+      }
+
       .container {
-        height: 100%;
       }
 
       .container-2-colums {
@@ -29,18 +34,63 @@
       .container-2-colums .pane {
         flex-basis: 0;
         flex-grow: 1;
-        height: 100%;
+        /*height: 100%;*/
         padding: 10px;
+        max-width: 50%;
       }
 
       textarea.code {
         width: 100%;
         height: 100%;
+        font-size: 0.8em;
+
+        background-color: transparent;
+        border: none;
+        color: #BBB;
       }
 
       .code-text {
         font-family: monospace;
         white-space: pre;
+        overflow-x: auto;
+        font-size: 0.8em;
+        color: #BBB;
+      }
+
+
+      .editor {
+        background-color: #2e2e39;
+      }
+
+      .code-ast-indent {
+        margin-left: 15px;
+      }
+      .code-ast-keyword, .code-ast-identifier, .code-ast-literal, .code-ast-brace {
+        margin: 0 0.4em;
+      }
+      .code-ast-keyword {
+        color: #994072;
+      }
+      .code-ast-identifier {
+        margin: 0 2px;
+        color: #68a2ed;
+      }
+      .code-ast-literal {
+        margin: 0 2px;
+        color: #ec584d;
+      }
+      .code-ast-brace {
+        color: #939393;
+      }
+      .code-ast-brace-left {
+        margin-right: -2px;
+      }
+      .code-ast-brace-right {
+        margin-left: -2px;
+      }
+
+      .code-ast:hover {
+        background-color: #535343;
       }
     </style>
   </body>

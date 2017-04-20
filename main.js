@@ -2,6 +2,7 @@
 
 function initialiseEditor (editorEl) {
   let inJsEl = editorEl.querySelector('.editor-in-js')
+  let outLiveEl = editorEl.querySelector('.editor-out-live')
   let outPrettyEl = editorEl.querySelector('.editor-out-pretty')
   let statusEl = editorEl.querySelector('.editor-status')
 
@@ -11,6 +12,7 @@ function initialiseEditor (editorEl) {
     statusEl.innerText = 'Parsing'
     try {
       let ast = compile(js)
+      outLiveEl.innerHTML = PP.printHtml(ast)
       outPrettyEl.innerText = PP.print(ast)
       statusEl.innerText = 'Idle'
     } catch (e) {
@@ -284,8 +286,12 @@ var PP = {
   print: function (ast) {
     let layout = this._layout(scrollLets(sugarifyLet(ast)))
     let rows = this._flatten(layout)
-    // console.log(this._render(rows)) || _$throw(new Error())
     return this._render(rows)
+  },
+
+  printHtml: function (ast) {
+    let layout = this._layout(scrollLets(sugarifyLet(ast)))
+    return this._renderHtml(layout)
   },
 
   _layout: function (ast) {
@@ -469,6 +475,28 @@ var PP = {
       if (acc.length > 0) acc += '\n'
       return acc + renderRow(row)
     }, '')
+  },
+
+  _renderHtml: function (layout) {
+    if (Array.isArray(layout)) return layout.map(l => this._renderHtml(l)).join('')
+    switch (layout.type) {
+      case 'newline': return '<div></div>'
+      case 'keyword': return '<span class="code-ast code-ast-keyword">' + layout.value + '</span>'
+      case 'identifier': return '<span class="code-ast code-ast-identifier">' + layout.value + '</span>'
+      case 'literal': return '<span class="code-ast code-ast-literal">' + JSON.stringify(layout.value) + '</span>'
+
+      case 'paren_left': return '<span class="code-ast code-ast-brace code-ast-brace-left">(</span>'
+      case 'paren_right': return '<span class="code-ast code-ast-brace code-ast-brace-right">)</span>'
+
+      case 'indent': {
+        let inner = this._renderHtml(layout.value)
+        return '<div class="code-ast-indent">' + inner + '</div>'
+      }
+
+      default:
+        console.warn('Unknown layout type', layout.type, layout)
+        return '<div>' + JSON.stringify(layout).split('<').join('&lt;') + '</div>'
+    }
   }
 }
 
