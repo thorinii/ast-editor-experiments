@@ -3,7 +3,7 @@
 function initialiseEditor (editorEl) {
   let inJsEl = editorEl.querySelector('.editor-in-js')
   let outLiveEl = editorEl.querySelector('.editor-out-live')
-  let outPrettyEl = editorEl.querySelector('.editor-out-pretty')
+  let outJsEl = editorEl.querySelector('.editor-out-js')
   let statusEl = editorEl.querySelector('.editor-status')
 
   statusEl.innerText = 'Initialising'
@@ -13,7 +13,7 @@ function initialiseEditor (editorEl) {
     try {
       let ast = compile(js)
       outLiveEl.innerHTML = PP.printHtml(ast)
-      outPrettyEl.innerText = PP.print(ast)
+      outJsEl.innerText = Bootstrap.translate(ast)
       statusEl.innerText = 'Idle'
     } catch (e) {
       statusEl.innerText = 'Error: ' + e
