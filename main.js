@@ -3,6 +3,7 @@
 function initialiseEditor (editorEl) {
   let inJsEl = editorEl.querySelector('.editor-in-js')
   let outLiveEl = editorEl.querySelector('.editor-out-live')
+  let outLiveTestEl = editorEl.querySelector('.editor-out-live-test')
   let outJsEl = editorEl.querySelector('.editor-out-js')
   let statusEl = editorEl.querySelector('.editor-status')
 
@@ -12,11 +13,21 @@ function initialiseEditor (editorEl) {
     statusEl.innerText = 'Parsing'
     try {
       let ast = compile(js)
+      let astJs = Bootstrap.translate(ast)
+
       outLiveEl.innerHTML = PP.printHtml(ast)
-      outJsEl.innerText = Bootstrap.translate(ast)
-      statusEl.innerText = 'Idle'
+      outJsEl.innerText = astJs
+
+      try {
+        let compiledAst = compile(astJs)
+        let astRenderedItself = compiledAst(ast)
+        outLiveTestEl.innerHTML = astRenderedItself
+        statusEl.innerText = 'Idle'
+      } catch (e) {
+        statusEl.innerText = 'AST Compile Error: ' + e
+      }
     } catch (e) {
-      statusEl.innerText = 'Error: ' + e
+      statusEl.innerText = 'JS Compile Error: ' + e
     }
   }
 
@@ -301,7 +312,7 @@ var PP = {
 
       case 'binary': {
         let items = ast.args.map(a => this._layout(a))
-        if (ast.args.length > 5 || isMultiline(items)) {
+        if (ast.args.length > 8 || isMultiline(items)) {
           let row = []
           items.forEach(i => {
             if (row.length > 0) row.push(kw(ast.op), newline())
@@ -322,10 +333,15 @@ var PP = {
         if (ast.bindings.length === 1) {
           let binding = ast.bindings[0]
           let bindingL = this._layout(binding[1])
+          let resultL = this._layout(ast.result)
           if (isMultiline(bindingL)) {
-            return [kw('let'), newline(), indent(id(binding[0]), kw('='), bindingL), newline(), kw('in'), newline(), indent(this._layout(ast.result))]
+            return [kw('let'), newline(), indent(id(binding[0]), kw('='), bindingL), newline(), kw('in'), newline(), indent(resultL)]
           } else {
-            return [kw('let'), id(binding[0]), kw('='), bindingL, kw('in'), indent(this._layout(ast.result))]
+            if (isMultiline(resultL)) {
+              return [kw('let'), id(binding[0]), kw('='), bindingL, kw('in'), newline(), indent(resultL)]
+            } else {
+              return [kw('let'), id(binding[0]), kw('='), bindingL, kw('in'), resultL]
+            }
           }
         } else {
           let bindings = []
@@ -364,7 +380,7 @@ var PP = {
           if (isMultiline(result)) result = [newline(), indent(result)]
           result = [result, newline()]
           switch (c[0].type) {
-            case 'any': return [kw('_'), kw('→'), result]
+            case 'any': return [id('_'), kw('→'), result]
             case 'literal': return [lit(c[0].value), kw('→'), result]
             default: return [kw('UNKNOWN_CASE'), kw('→'), result]
           }
@@ -481,9 +497,9 @@ var PP = {
     if (Array.isArray(layout)) return layout.map(l => this._renderHtml(l)).join('')
     switch (layout.type) {
       case 'newline': return '<div></div>'
-      case 'keyword': return '<span class="code-ast code-ast-keyword">' + layout.value + '</span>'
-      case 'identifier': return '<span class="code-ast code-ast-identifier">' + layout.value + '</span>'
-      case 'literal': return '<span class="code-ast code-ast-literal">' + JSON.stringify(layout.value) + '</span>'
+      case 'keyword': return '<span class="code-ast code-ast-keyword">' + layout.value.split('<').join('&lt;') + '</span>'
+      case 'identifier': return '<span class="code-ast code-ast-identifier">' + layout.value.split('<').join('&lt;') + '</span>'
+      case 'literal': return '<span class="code-ast code-ast-literal">' + JSON.stringify(layout.value).split('<').join('&lt;') + '</span>'
 
       case 'paren_left': return '<span class="code-ast code-ast-brace code-ast-brace-left">(</span>'
       case 'paren_right': return '<span class="code-ast code-ast-brace code-ast-brace-right">)</span>'
@@ -589,6 +605,37 @@ function Array$join (joiner) {
   }
 }
 
+function Array$push (array) {
+  return function (item) {
+    return array.concat([item])
+  }
+}
+
+function Array$intersperse (item) {
+  return function (array) {
+    let ret = []
+    array.forEach((itm, idx) => {
+      if (idx > 0) ret.push(item)
+      ret.push(itm)
+    })
+    return ret
+  }
+}
+
+function map (fn) {
+  return function (array) {
+    return array.map((i) => fn(i))
+  }
+}
+
+function foldL (fn) {
+  return function (zero) {
+    return function (array) {
+      return array.reduce((acc, i) => fn(acc)(i), zero)
+    }
+  }
+}
+
 function foldR (fn) {
   return function (zero) {
     return function (array) {
@@ -597,9 +644,13 @@ function foldR (fn) {
   }
 }
 
+function htmlEscape (html) {
+  return html.split('<').join('&lt;');
+}
+
 window.addEventListener('load', () => {
   runTests()
   initialiseEditor(document.querySelector('.editor'))
 })
 
-foldR; Array$join; Fn$bind1; _$throw
+map; foldL; foldR; Array$join; Fn$bind1; _$throw
