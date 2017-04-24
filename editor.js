@@ -8,12 +8,13 @@ function Editor (el) {
     cursor: []
   }
 
-  if (typeof __initialAst !== 'undefined') {
-    this._state.ast = __initialAst
-  }
-
   this._constructEditor(el)
   this._render(this._state)
+}
+
+Editor.prototype.showAst = function (ast) {
+  this._state.ast = ast
+  this._scheduleRender()
 }
 
 Editor.prototype._constructEditor = function (el) {
@@ -26,9 +27,7 @@ Editor.prototype._constructEditor = function (el) {
   this._astEl.addEventListener('keypress', pipe(
     e => { e.preventDefault(); return e },
     translateKeyEvent,
-    e => {
-      console.log('press', e.modifiers.concat([e.key]).join(' + '))
-    }))
+    e => this._processKeyboardEvent(e)))
 
   this._el.appendChild(this._statusEl)
 
@@ -38,7 +37,7 @@ Editor.prototype._constructEditor = function (el) {
   ])
   this._el.appendChild(container)
 
-  this._el.appendChild(this._inJsEl)
+  // this._el.appendChild(this._inJsEl)
   this._el.appendChild(this._debugOutJsEl)
 }
 
@@ -46,6 +45,9 @@ Editor.prototype._status = function (message) {
   this._statusEl.innerText = message
 }
 
+Editor.prototype._scheduleRender = function () {
+  window.setTimeout(() => this._render(this._state))
+}
 
 Editor.prototype._render = function (state) {
   this._renderAst(state.ast)
@@ -71,6 +73,26 @@ Editor.prototype._renderAst = function (ast) {
   } catch (e) {
     this._status('JS Compile Error: ' + e)
   }
+}
+
+Editor.prototype._processKeyboardEvent = function (e) {
+  if (e.key === '<space>' && e.modifiers.length === 0) {
+    this._state.ast = {
+      type: 'apply',
+      fn: this._state.ast,
+      arg: {type: 'hole'}
+    }
+  } else if (e.key === '.' && e.modifiers.length === 0) {
+    this._state.ast = {
+      type: 'apply',
+      fn: {type: 'hole'},
+      arg: this._state.ast
+    }
+  } else {
+    console.log(e)
+  }
+
+  this._scheduleRender()
 }
 
 function createElement (type, attributes = {}, contents = []) {
@@ -108,6 +130,10 @@ function translateKeyEvent (ev) {
       case KeyboardEvent.DOM_VK_ESCAPE: return '<escape>'
       case KeyboardEvent.DOM_VK_RETURN: return '<enter>'
       case KeyboardEvent.DOM_VK_TAB: return '<tab>'
+      case KeyboardEvent.DOM_VK_UP: return '<up>'
+      case KeyboardEvent.DOM_VK_DOWN: return '<down>'
+      case KeyboardEvent.DOM_VK_LEFT: return '<left>'
+      case KeyboardEvent.DOM_VK_RIGHT: return '<right>'
       default: return null
     }
   }

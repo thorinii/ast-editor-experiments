@@ -102,6 +102,7 @@ var Bootstrap = {
   translate: function (ast) {
     ast = scrollLets(sugarifyLet(ast))
     switch (ast.type) {
+      case 'hole': return 'undefined'
       case 'literal': return JSON.stringify(ast.value)
       case 'variable': return ast.id
       case 'binary': return ast.args.map(a => this.translateP(a)).join(' ' + ast.op + ' ')
@@ -155,6 +156,7 @@ function rewriteAstTopFirst (fn) {
     ast = fn(ast)
 
     switch (ast.type) {
+      case 'hole':
       case 'literal':
       case 'variable':
         return ast
@@ -269,6 +271,8 @@ var PP = {
 
   _layout: function (ast) {
     switch (ast.type) {
+      case 'hole': return [kw('???')]
+
       case 'literal': return [lit(ast.value)]
       case 'variable': return [id(ast.id)]
 
