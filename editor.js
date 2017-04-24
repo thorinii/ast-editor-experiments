@@ -23,6 +23,13 @@ Editor.prototype._constructEditor = function (el) {
   this._debugOutAstEl = createElement('div', {class: 'code-text'})
   this._debugOutJsEl = createElement('div', {class: 'code-text'})
 
+  this._astEl.addEventListener('keypress', pipe(
+    e => { e.preventDefault(); return e },
+    translateKeyEvent,
+    e => {
+      console.log('press', e.modifiers.concat([e.key]).join(' + '))
+    }))
+
   this._el.appendChild(this._statusEl)
 
   let container = createElement('div', {class: 'container container-2-columns'}, [
@@ -86,4 +93,41 @@ function createElement (type, attributes = {}, contents = []) {
   })
 
   return el
+}
+
+function pipe (...fns) {
+  return function (arg) {
+    return fns.reduce((acc, fn) => fn(acc), arg)
+  }
+}
+
+function translateKeyEvent (ev) {
+  const keyCodeToKey = code => {
+    switch (code) {
+      case KeyboardEvent.DOM_VK_DELETE: return '<delete>'
+      case KeyboardEvent.DOM_VK_ESCAPE: return '<escape>'
+      case KeyboardEvent.DOM_VK_RETURN: return '<enter>'
+      case KeyboardEvent.DOM_VK_TAB: return '<tab>'
+      default: return null
+    }
+  }
+  const charToKey = char => {
+    switch (char) {
+      case 'backspace': return '<backspace>'
+      case ' ': return '<space>'
+      default: return char
+    }
+  }
+
+  const key = keyCodeToKey(ev.keyCode) || charToKey(ev.key.toLowerCase())
+
+  const modifiers = []
+  if (ev.ctrlKey) modifiers.push('ctrl')
+  if (ev.shiftKey) modifiers.push('shift')
+  if (ev.altKey) modifiers.push('alt')
+
+  return {
+    key: key,
+    modifiers: modifiers
+  }
 }
