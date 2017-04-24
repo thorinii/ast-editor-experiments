@@ -1,43 +1,5 @@
 'use strict'
 
-function initialiseEditor (editorEl) {
-  let inJsEl = editorEl.querySelector('.editor-in-js')
-  let outLiveEl = editorEl.querySelector('.editor-out-live')
-  let outLiveTestEl = editorEl.querySelector('.editor-out-live-test')
-  let outJsEl = editorEl.querySelector('.editor-out-js')
-  let statusEl = editorEl.querySelector('.editor-status')
-
-  statusEl.innerText = 'Initialising'
-
-  const parseAndCompile = js => {
-    statusEl.innerText = 'Parsing'
-    try {
-      let ast = compile(js)
-      let astJs = Bootstrap.translate(ast)
-
-      outLiveEl.innerHTML = PP.printHtml(ast)
-      outJsEl.innerText = astJs
-
-      try {
-        let compiledAst = compile(astJs)
-        let astRenderedItself = compiledAst(ast)
-        outLiveTestEl.innerHTML = astRenderedItself
-        statusEl.innerText = 'Idle'
-      } catch (e) {
-        statusEl.innerText = 'AST Compile Error: ' + e
-      }
-    } catch (e) {
-      statusEl.innerText = 'JS Compile Error: ' + e
-    }
-  }
-
-  inJsEl.addEventListener('input', () => {
-    parseAndCompile(inJsEl.value)
-  })
-
-  parseAndCompile(inJsEl.value)
-}
-
 function runTests (test) {
   var test1 =
     ap(
@@ -645,12 +607,7 @@ function foldR (fn) {
 }
 
 function htmlEscape (html) {
-  return html.split('<').join('&lt;');
+  return html.split('<').join('&lt;')
 }
-
-window.addEventListener('load', () => {
-  runTests()
-  initialiseEditor(document.querySelector('.editor'))
-})
 
 map; foldL; foldR; Array$join; Fn$bind1; _$throw

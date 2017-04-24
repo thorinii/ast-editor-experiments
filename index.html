@@ -2,23 +2,11 @@
   <head>
     <meta charset="utf-8" />
     <script src="main.js" type="application/javascript"></script>
+    <script src="editor-ast.js" type="application/javascript"></script>
+    <script src="editor.js" type="application/javascript"></script>
   </head>
   <body>
-    <div class="editor">
-      <div class="message editor-status">Idle</div>
-
-      <div class="container container-2-colums">
-        <div class="pane">
-          <textarea class="code editor-in-js"></textarea>
-        </div>
-        <div class="pane">
-          <div class="code-text editor-out-live-test"></div>
-          <div class="code-text editor-out-live"></div>
-        </div>
-      </div>
-
-      <div class="code-text editor-out-js"></div>
-    </div>
+    <div class="editor"></div>
 
     <style>
       div, * {
@@ -32,11 +20,11 @@
       .container {
       }
 
-      .container-2-colums {
+      .container-2-columns {
         display: flex;
         flex-direction: row;
       }
-      .container-2-colums .pane {
+      .container-2-columns .pane {
         flex-basis: 0;
         flex-grow: 1;
         /*height: 100%;*/
@@ -49,8 +37,7 @@
         height: 100%;
         font-size: 0.8em;
 
-        min-width: 100%;
-        max-width: 100%;
+        resize: vertical;
 
         background-color: transparent;
         color: #BBB;
@@ -58,7 +45,7 @@
         border: 1px solid transparent;
       }
       textarea.code:focus {
-        border: 1px dashed white;
+        border: 1px dotted white;
       }
 
       .code-text {
@@ -75,7 +62,7 @@
         min-height: 100%;
       }
 
-      .editor-status {
+      .editor .message {
         background-color: #551111;
         color: #EEEEEE;
         padding: 5px;
@@ -107,9 +94,16 @@
         margin-left: -0.4em;
       }
 
-      .code-ast:hover, .code-ast-node:hover {
+      .code-ast:hover {
         background-color: #535343;
       }
+      .code-ast-node:hover {
+        background-color: #53534333;
+      }
     </style>
+
+    <script type="text/javascript">
+      var editor = new Editor(document.querySelector('.editor'))
+    </script>
   </body>
 </html>

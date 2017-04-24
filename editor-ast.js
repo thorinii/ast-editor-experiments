@@ -1,4 +1,4 @@
-var editorRenderAst = lam('ast', lets(
+var __initialAst = lam('ast', lets(
 
   'debugSeq', lam('print', 'ret', lets(
     'ignored', ap('console.log', 'print'),
