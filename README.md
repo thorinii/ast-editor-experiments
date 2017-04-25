@@ -12,8 +12,10 @@ There is no usage yet.
 
 * Selection/cursor
 * Navigation
+* Immutable state & dispatch/reducer system
 * Keyboard command binding (use proper key-binding system)
 * Implement more commands
   * Variable
   * Literals
 * Use AST functions to execute commands
+* Mouse

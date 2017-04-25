@@ -1,0 +1,21 @@
+{
+  "name": "ast-editor-experiments",
+  "homepage": "https://github.com/thorinii/ast-editor-experiments",
+  "authors": [
+    "Lachlan Phillips <flipsidelachy@gmail.com>"
+  ],
+  "description": "Experimental AST editors",
+  "main": "index.html",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "react": "^15.5.4"
+  }
+}

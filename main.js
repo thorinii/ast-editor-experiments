@@ -429,56 +429,44 @@ var PP = {
     return rows
   },
 
-  _render: function (rows) {
-    const renderItem = item => {
-      switch (item.type) {
-        case 'keyword':
-          return item.value + ' '
-        case 'identifier':
-          return item.value + ' '
-        case 'literal':
-          return JSON.stringify(item.value) + ' '
-        case 'paren_left':
-          return '( '
-        case 'paren_right':
-          return ') '
-        case 'indent':
-          return '  '
-        default:
-          console.warn('UNKNOWN layout type:', item.type, item)
-          return '???'
-      }
-    }
-    const renderRow = row => {
-      return row.map(i => renderItem(i)).join('')
-    }
-
-    return rows.reduce((acc, row) => {
-      if (acc.length > 0) acc += '\n'
-      return acc + renderRow(row)
-    }, '')
-  },
-
   _renderHtml: function (layout) {
-    if (Array.isArray(layout)) return layout.map(l => this._renderHtml(l)).join('')
-    switch (layout.type) {
-      case 'newline': return '<div></div>'
-      case 'keyword': return '<span class="code-ast code-ast-keyword">' + layout.value.split('<').join('&lt;') + '</span>'
-      case 'identifier': return '<span class="code-ast code-ast-identifier">' + layout.value.split('<').join('&lt;') + '</span>'
-      case 'literal': return '<span class="code-ast code-ast-literal">' + JSON.stringify(layout.value).split('<').join('&lt;') + '</span>'
+    if (Array.isArray(layout)) return this._flattenArray(layout.map(l => this._renderHtml(l)))
 
-      case 'paren_left': return '<span class="code-ast code-ast-brace code-ast-brace-left">(</span>'
-      case 'paren_right': return '<span class="code-ast code-ast-brace code-ast-brace-right">)</span>'
+    const el = React.createElement
+
+    switch (layout.type) {
+      case 'newline': return el('div')
+      case 'keyword': return el('span', {className: 'code-ast code-ast-keyword'}, layout.value)
+      case 'identifier': return el('span', {className: 'code-ast code-ast-identifier'}, layout.value)
+      case 'literal': return el('span', {className: 'code-ast code-ast-literal'}, JSON.stringify(layout.value))
+
+      case 'paren_left': return el('span', {className: 'code-ast code-ast-brace code-ast-brace-left'}, '(')
+      case 'paren_right': return el('span', {className: 'code-ast code-ast-brace code-ast-brace-right'}, ')')
 
       case 'indent': {
         let inner = this._renderHtml(layout.value)
-        return '<div class="code-ast-indent">' + inner + '</div>'
+        return el('div', {className: 'code-ast-indent'}, ...inner)
       }
 
       default:
         console.warn('Unknown layout type', layout.type, layout)
         return '<div>' + JSON.stringify(layout).split('<').join('&lt;') + '</div>'
     }
+  },
+
+  _flattenArray: function (array) {
+    let tmp = []
+
+    const go = a => {
+      if (Array.isArray(a)) {
+        a.forEach(el => go(el))
+      } else {
+        tmp.push(a)
+      }
+    }
+
+    go(array)
+    return tmp
   }
 }
 
@@ -563,6 +551,10 @@ function Fn$bind1 (fn) {
       return fn.call(_this, a)
     }
   }
+}
+
+function Fn$apply3 (fn) {
+  return a => b => c => fn(a, b, c)
 }
 
 function Array$join (joiner) {

@@ -4,12 +4,12 @@ function Editor (el) {
   this._el = el
 
   this._state = {
+    status: 'Idle',
     ast: {type: 'hole'},
     cursor: []
   }
 
-  this._constructEditor(el)
-  this._render(this._state)
+  this._render(el, this._state)
 }
 
 Editor.prototype.showAst = function (ast) {
@@ -17,44 +17,44 @@ Editor.prototype.showAst = function (ast) {
   this._scheduleRender()
 }
 
-Editor.prototype._constructEditor = function (el) {
-  this._statusEl = createElement('div', {class: 'message'}, ['Idle'])
-  this._inJsEl = createElement('textarea', {class: 'code'})
-  this._astEl = createElement('div', {class: 'code-text', tabindex: 0})
-  this._debugOutAstEl = createElement('div', {class: 'code-text'})
-  this._debugOutJsEl = createElement('div', {class: 'code-text'})
+Editor.prototype._scheduleRender = function () {
+  window.setTimeout(() => this._render(this._el, this._state))
+}
 
-  this._astEl.addEventListener('keypress', pipe(
+Editor.prototype._render = function (el, state) {
+  const e = React.createElement
+
+  const keyListener = pipe(
     e => { e.preventDefault(); return e },
     translateKeyEvent,
-    e => this._processKeyboardEvent(e)))
+    e => this._processKeyboardEvent(e))
 
-  this._el.appendChild(this._statusEl)
+  const tryFn = (fn, error) => { try { return fn() } catch (e) { return error(e) } }
 
-  let container = createElement('div', {class: 'container container-2-columns'}, [
-    createElement('div', {class: 'pane'}, [this._astEl]),
-    createElement('div', {class: 'pane'}, [this._debugOutAstEl])
-  ])
-  this._el.appendChild(container)
+  let statusEl = e('div', {className: 'message'}, state.status)
+  // let inJsEl = e('textarea', {className: 'code'})
 
-  // this._el.appendChild(this._inJsEl)
-  this._el.appendChild(this._debugOutJsEl)
-}
+  let astEl = e('div', {className: 'code-text', tabIndex: 0, onKeyPress: keyListener},
+    tryFn(() => compile(Bootstrap.translate(state.ast))(state.ast), e => '' + e))
+  let debugOutAstEl = e('div', {className: 'code-text'},
+    ...tryFn(() => PP.printHtml(state.ast), e => ['' + e]))
+  let debugOutJsEl = e('div', {className: 'code-text'},
+    tryFn(() => Bootstrap.translate(state.ast), e => '' + e))
 
-Editor.prototype._status = function (message) {
-  this._statusEl.innerText = message
-}
+  let editorContainer = e('div', {},
+    statusEl,
+    e('div', {className: 'container container-2-columns'},
+      e('div', {className: 'pane'}, astEl),
+      e('div', {className: 'pane'}, debugOutAstEl)),
+    debugOutJsEl)
 
-Editor.prototype._scheduleRender = function () {
-  window.setTimeout(() => this._render(this._state))
-}
+  ReactDOM.render(editorContainer, el)
 
-Editor.prototype._render = function (state) {
-  this._renderAst(state.ast)
+  // this._renderAst(state.ast)
 }
 
 Editor.prototype._renderAst = function (ast) {
-  this._status('Parsing')
+  this._state.status = 'Parsing'
 
   try {
     let astJs = Bootstrap.translate(ast)
@@ -73,6 +73,8 @@ Editor.prototype._renderAst = function (ast) {
   } catch (e) {
     this._status('JS Compile Error: ' + e)
   }
+
+  this._scheduleRender()
 }
 
 Editor.prototype._processKeyboardEvent = function (e) {
