@@ -10,8 +10,7 @@ There is no usage yet.
 
 ## TODO
 
-* Selection/cursor
-* Navigation
+* Fix cursor handling of indexed things
 * Immutable state & dispatch/reducer system
 * Asynchronous compilation
 * More rolling up of nested things (in the core AST as well)

@@ -25,7 +25,7 @@ Editor.prototype._render = function (el, state) {
   const e = React.createElement
 
   const keyListener = pipe(
-    e => { e.preventDefault(); return e },
+    e => { e.preventDefault(); e.stopPropagation(); e.nativeEvent.stopImmediatePropagation(); return e },
     translateKeyEvent,
     e => this._processKeyboardEvent(e))
 
@@ -67,6 +67,10 @@ Editor.prototype._processKeyboardEvent = function (e) {
       fn: {type: 'hole'},
       arg: this._state.ast
     }
+  } else if (e.key === 'l' && e.modifiers.length === 0) {
+    this._state.cursor = relativeLeaf(this._state.ast, this._state.cursor, 1)
+  } else if (e.key === 'h' && e.modifiers.length === 0) {
+    this._state.cursor = relativeLeaf(this._state.ast, this._state.cursor, -1)
   } else {
     console.log(e)
   }
@@ -74,26 +78,50 @@ Editor.prototype._processKeyboardEvent = function (e) {
   this._scheduleRender()
 }
 
-function createElement (type, attributes = {}, contents = []) {
-  let el = document.createElement(type)
+function relativeLeaf (ast, cursor, offset) {
+  const prepend = (el, arrayOfArrays) =>
+    (arrayOfArrays.length === 0) ? [[el]] : arrayOfArrays.map(a => [el].concat(a))
+  const findCursors = ast => {
+    switch (ast.type) {
+      case 'literal': return []
+      case 'variable': return []
 
-  for (let key in attributes) {
-    if (attributes.hasOwnProperty(key)) {
-      el.setAttribute(key, attributes[key])
+      case 'binary':
+        return ast.args
+          .map((b, idx) => prepend(idx, findCursors(b)))
+          .reduce((acc, a) => acc.concat(a), [])
+
+      case 'let+':
+        return ast.bindings
+          .map((b, idx) => prepend(idx, prepend('value', findCursors(b[1]))))
+          .reduce((acc, a) => acc.concat(a), [])
+          .concat(prepend('value', findCursors(ast.result)))
+
+      case 'lambda':
+        return prepend('value', findCursors(ast.value))
+
+      case 'apply':
+        return prepend('fn', findCursors(ast.fn))
+          .concat(prepend('arg', findCursors(ast.arg)))
+
+      case 'pattern':
+        return ast.cases
+          .map((c, idx) => prepend(idx, prepend('value', findCursors(c[1]))))
+          .reduce((acc, a) => acc.concat(a), [])
+          .concat(prepend('arg', findCursors(ast.arg)))
+
+      default:
+        console.warn('Unknown AST node', ast.type, ast)
+        return ['?' + ast.type]
     }
   }
 
-  contents.forEach(c => {
-    if (typeof c === 'string') {
-      el.appendChild(document.createTextNode(c))
-    } else if (c instanceof Element) {
-      el.appendChild(c)
-    } else {
-      throw new TypeError('Cannot attach content that is not a String or Element: ' + c)
-    }
-  })
+  const cursors = findCursors(scrollLets(sugarifyLet(ast)))
+  const currentIndex = cursors.findIndex(c => JSON.stringify(c) === JSON.stringify(cursor))
 
-  return el
+  const nextIndex = Math.max(0, Math.min(cursors.length-1, currentIndex + offset))
+  console.log('now', currentIndex, 'next:', nextIndex, 'result:', JSON.stringify(cursors[nextIndex]))
+  return cursors[nextIndex]
 }
 
 function pipe (...fns) {

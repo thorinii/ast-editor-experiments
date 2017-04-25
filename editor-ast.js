@@ -36,6 +36,9 @@ const debugSeq_ = (value) => lets('tmp', value, ap('debugSeq', 'tmp', 'tmp'))
 
 const Array$dropFirst = array => array.slice(1)
 
+
+const mapIdx = fn => array => array.map((i, idx) => fn(i)(idx))
+
 var __initialAst = lam('cursor', 'ast', lets(
 
   'debugSeq', lam('print', 'ret', lets(
