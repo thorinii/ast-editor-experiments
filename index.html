@@ -2,8 +2,8 @@
   <head>
     <meta charset="utf-8" />
     <script src="main.js" type="application/javascript"></script>
-    <script src="bower_components/react/react.js" type="application/javascript"></script>
-    <script src="bower_components/react/react-dom.js" type="application/javascript"></script>
+    <script src="bower_components/react/react.min.js" type="application/javascript"></script>
+    <script src="bower_components/react/react-dom.min.js" type="application/javascript"></script>
     <script src="editor-ast.js" type="application/javascript"></script>
     <script src="editor.js" type="application/javascript"></script>
   </head>
@@ -75,7 +75,7 @@
       }
 
       .code-ast-keyword, .code-ast-identifier, .code-ast-literal, .code-ast-brace {
-        margin: 0 0.4em;
+        padding: 0 0.4em;
       }
       .code-ast-keyword {
         color: #ad5385;
@@ -90,17 +90,21 @@
         color: #939393;
       }
       .code-ast-brace-left {
-        margin-right: -0.4em;
+        margin-right: -0.6em;
       }
       .code-ast-brace-right {
-        margin-left: -0.4em;
+        margin-left: -0.6em;
       }
 
       .code-ast:hover {
         background-color: #535343;
       }
-      .code-ast-node:hover {
-        background-color: #53534333;
+      .code-ast-node.highlightable:hover {
+        background-color: #535343;
+      }
+
+      .code-ast-node.selected {
+        background-color: #3b4509;
       }
     </style>
 

@@ -6,7 +6,7 @@ function Editor (el) {
   this._state = {
     status: 'Idle',
     ast: {type: 'hole'},
-    cursor: []
+    cursor: ['value', 'value', 0, 'value', 'value', 'value', 0, 'value', 'fn']
   }
 
   this._render(el, this._state)
@@ -35,46 +35,23 @@ Editor.prototype._render = function (el, state) {
   // let inJsEl = e('textarea', {className: 'code'})
 
   let astEl = e('div', {className: 'code-text', tabIndex: 0, onKeyPress: keyListener},
-    tryFn(() => compile(Bootstrap.translate(state.ast))(state.ast), e => '' + e))
+    tryFn(() => compile(Bootstrap.translate(state.ast))(state.cursor)(state.ast), e => '' + e))
   let debugOutAstEl = e('div', {className: 'code-text'},
     ...tryFn(() => PP.printHtml(state.ast), e => ['' + e]))
   let debugOutJsEl = e('div', {className: 'code-text'},
     tryFn(() => Bootstrap.translate(state.ast), e => '' + e))
+  let debugOutAstJsonEl = e('div', {className: 'code-text'},
+    tryFn(() => false ? JSON.stringify(state.ast, null, '  ') : '', e => '' + e))
 
   let editorContainer = e('div', {},
     statusEl,
     e('div', {className: 'container container-2-columns'},
       e('div', {className: 'pane'}, astEl),
       e('div', {className: 'pane'}, debugOutAstEl)),
-    debugOutJsEl)
+    debugOutJsEl,
+    debugOutAstJsonEl)
 
   ReactDOM.render(editorContainer, el)
-
-  // this._renderAst(state.ast)
-}
-
-Editor.prototype._renderAst = function (ast) {
-  this._state.status = 'Parsing'
-
-  try {
-    let astJs = Bootstrap.translate(ast)
-
-    this._debugOutAstEl.innerHTML = PP.printHtml(ast)
-    this._debugOutJsEl.innerText = astJs
-
-    try {
-      let compiledAst = compile(astJs)
-      let astRenderedItself = compiledAst(ast)
-      this._astEl.innerHTML = astRenderedItself
-      this._status('Idle')
-    } catch (e) {
-      this._status('AST Compile Error: ' + e)
-    }
-  } catch (e) {
-    this._status('JS Compile Error: ' + e)
-  }
-
-  this._scheduleRender()
 }
 
 Editor.prototype._processKeyboardEvent = function (e) {
