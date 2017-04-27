@@ -105,10 +105,10 @@ function relativeLeaf (ast, cursor, offset) {
           .concat(prepend('arg', findCursors(ast.arg)))
 
       case 'pattern':
-        return ast.cases
-          .map((c, idx) => prepend(idx, prepend('value', findCursors(c[1]))))
-          .reduce((acc, a) => acc.concat(a), [])
-          .concat(prepend('arg', findCursors(ast.arg)))
+        return prepend('arg', findCursors(ast.arg))
+          .concat(ast.cases
+            .map((c, idx) => prepend(idx, prepend('value', findCursors(c[1]))))
+            .reduce((acc, a) => acc.concat(a), []))
 
       default:
         console.warn('Unknown AST node', ast.type, ast)
@@ -120,7 +120,6 @@ function relativeLeaf (ast, cursor, offset) {
   const currentIndex = cursors.findIndex(c => JSON.stringify(c) === JSON.stringify(cursor))
 
   const nextIndex = Math.max(0, Math.min(cursors.length-1, currentIndex + offset))
-  console.log('now', currentIndex, 'next:', nextIndex, 'result:', JSON.stringify(cursors[nextIndex]))
   return cursors[nextIndex]
 }
 

@@ -84,15 +84,15 @@ var __initialAst = lam('cursor', 'ast', lets(
         l('variable'), ap('id', 'ast.id', 'selected'),
 
         l('binary'), lets(
-          'all', ap('Array$intersperse', ap('kw', 'ast.op'), ap('map', ap('translate', ap('unwrapCursor', l(0), 'cursor')), 'ast.args')),
+          'all', ap('Array$intersperse', ap('kw', 'ast.op'), ap('mapIdx', lam('a', 'idx', ap('translate', ap('unwrapCursor', 'idx', 'cursor'), 'a')), 'ast.args')),
           ap('node', l('binary'), 'selected', 'all')
         ),
 
         l('let+'), lets(
           'value', ap('translate', ap('unwrapCursor', l('value'), 'cursor'), 'ast.result'),
           'joiner', ifEq('ast.bindings.length', l(1), l(''), ap('newline')),
-          'bindings', ap('map', lam('b',
-            arrayOf(ap('id', 'b[0]', l(false)), ap('kw', l('=')), ap('indent', ap('translate', ap('unwrapCursor', l('value'), ap('unwrapCursor', l(0), 'cursor')), 'b[1]')), 'joiner')
+          'bindings', ap('mapIdx', lam('b', 'idx',
+            arrayOf(ap('id', 'b[0]', l(false)), ap('kw', l('=')), ap('indent', ap('translate', ap('unwrapCursor', l('value'), ap('unwrapCursor', 'idx', 'cursor')), 'b[1]')), 'joiner')
           ), 'ast.bindings'),
           ap('node', l('let'), 'selected', arrayOf(
             ap('kw', l('let')),
@@ -122,13 +122,13 @@ var __initialAst = lam('cursor', 'ast', lets(
 
         l('pattern'), lets(
           'arg', ap('translate', ap('unwrapCursor', l('arg'), 'cursor'), 'ast.arg'),
-          'cases', ap('map', lam('b', lets(
+          'cases', ap('mapIdx', lam('b', 'idx', lets(
             'pattern', caseof('b[0].type',
               l('literal'), ap('lit', 'b[0].value', l(false)),
               l('any'), ap('id', l('_'), l(false)),
               any(), ap('debugSeq', 'b[0]', ap('id', 'b[0]', l(false)))
             ),
-            arrayOf('pattern', ap('kw', l('→')), ap('indent', ap('translate', ap('unwrapCursor', l('value'), ap('unwrapCursor', l(0), 'cursor')), 'b[1]')), 'newline'))
+            arrayOf('pattern', ap('kw', l('→')), ap('indent', ap('translate', ap('unwrapCursor', l('value'), ap('unwrapCursor', 'idx', 'cursor')), 'b[1]')), 'newline'))
           ), 'ast.cases'),
           ap('node', l('apply'), 'selected', arrayOf(
             ap('kw', l('case')),
