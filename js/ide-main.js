@@ -2,7 +2,7 @@ require.config({
   baseUrl: 'js'
 })
 
-define(['editor', 'editor-ast'], function (Editor, __initialAst) {
+define(['editor', 'initial-ast'], function (Editor, initialAst) {
   var editor = new Editor(document.querySelector('.editor'))
-  editor.showAst(__initialAst)
+  editor.showAst(initialAst)
 })
