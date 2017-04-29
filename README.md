@@ -27,17 +27,17 @@ There is no usage yet.
 
 ## TODO
 
+* Don't swallow Ctrl-R
 * Use JS handler to render the AST
-  * Switch it out
   * Add cursor rendering
-  * Use React pure functions?
+  * Use React pure components?
 * Use Require.js
   * Split into React components
-* Don't swallow Ctrl-R
 * Render a keymap chart
   * Based on the actual keybinding table
 * Immutable state & dispatch/reducer system
 * Asynchronous compilation
+* Better one-line rendering support (use complexity or approximate length)
 * More rolling up of nested things (in the core AST as well)
   * Lambda
   * Apply

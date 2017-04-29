@@ -32,11 +32,8 @@ Editor.prototype._render = function (el, state) {
   const tryFn = (fn, error) => { try { return fn() } catch (e) { return error(e) } }
 
   let statusEl = e('div', {className: 'message'}, state.status)
-  // let inJsEl = e('textarea', {className: 'code'})
 
   let astEl = e('div', {id: 'ast', className: 'code-text', tabIndex: 0},
-    tryFn(() => compile(Bootstrap.translate(state.ast))(state.cursor)(state.ast), e => '' + e))
-  let debugOutAstEl = e('div', {className: 'code-text'},
     ...tryFn(() => PP.printHtml(state.ast), e => ['' + e]))
   let debugOutJsEl = e('div', {className: 'code-text'},
     tryFn(() => Bootstrap.translate(state.ast), e => '' + e))
@@ -47,8 +44,7 @@ Editor.prototype._render = function (el, state) {
     statusEl,
     e('div', {className: 'container container-2-columns'},
       e('div', {className: 'pane'}, astEl),
-      e('div', {className: 'pane'}, debugOutAstEl)),
-    debugOutJsEl,
+      e('div', {className: 'pane'}, debugOutJsEl)),
     debugOutAstJsonEl)
 
   ReactDOM.render(editorContainer, el)
@@ -166,8 +162,11 @@ function translateKeyEvent (ev) {
   if (ev.shiftKey) modifiers.push('shift')
   if (ev.altKey) modifiers.push('alt')
 
+  const string = modifiers.join(' + ') + (modifiers.length ? ' + ' : '') + key
+
   return {
     key: key,
-    modifiers: modifiers
+    modifiers: modifiers,
+    string: string
   }
 }
