@@ -3,6 +3,23 @@
 See this project live at https://thorinii.github.io/ast-editor-experiments/.
 
 
+## Aim
+
+* An editor
+  * For Haskell-like languages
+    * Particularly Purescript
+  * That works the syntax tree
+* Should have efficient controls, but can have a learning curve
+* Awesome autocomplete
+  * Make use of the awesome type system
+  * The type system checking shouldn't get in the way of making multi-step edits
+* Stores everything in a database without regard for files
+  * Modules, yes. Files, no
+  * Toplevel declarations don't have an order
+* Tests can be spatially located close to the code
+  * Automatically run when things change
+
+
 ## Usage
 
 There is no usage yet.
@@ -10,9 +27,15 @@ There is no usage yet.
 
 ## TODO
 
-* Fix React keyboard handler with https://medium.com/@ericclemmons/react-event-preventdefault-78c28c950e46 (get arrows working again)
+* Use JS handler to render the AST
+  * Switch it out
+  * Add cursor rendering
+  * Use React pure functions?
 * Use Require.js
+  * Split into React components
 * Don't swallow Ctrl-R
+* Render a keymap chart
+  * Based on the actual keybinding table
 * Immutable state & dispatch/reducer system
 * Asynchronous compilation
 * More rolling up of nested things (in the core AST as well)
@@ -25,7 +48,10 @@ There is no usage yet.
 * Implement more commands
   * Variable
   * Literals
+* Database/serialisation
+  * Use LevelDB (https://github.com/Level/level) with encoding=json
 * Use AST functions to execute commands
+  * An abstract Editor Hooks function
 * Mouse
 
 

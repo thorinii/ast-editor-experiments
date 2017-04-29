@@ -25,7 +25,7 @@ Editor.prototype._render = function (el, state) {
   const e = React.createElement
 
   const keyListener = pipe(
-    e => { e.preventDefault(); e.stopPropagation(); e.nativeEvent.stopImmediatePropagation(); return e },
+    e => { e.preventDefault(); return e },
     translateKeyEvent,
     e => this._processKeyboardEvent(e))
 
@@ -34,7 +34,7 @@ Editor.prototype._render = function (el, state) {
   let statusEl = e('div', {className: 'message'}, state.status)
   // let inJsEl = e('textarea', {className: 'code'})
 
-  let astEl = e('div', {className: 'code-text', tabIndex: 0, onKeyPress: keyListener},
+  let astEl = e('div', {id: 'ast', className: 'code-text', tabIndex: 0},
     tryFn(() => compile(Bootstrap.translate(state.ast))(state.cursor)(state.ast), e => '' + e))
   let debugOutAstEl = e('div', {className: 'code-text'},
     ...tryFn(() => PP.printHtml(state.ast), e => ['' + e]))
@@ -52,6 +52,14 @@ Editor.prototype._render = function (el, state) {
     debugOutAstJsonEl)
 
   ReactDOM.render(editorContainer, el)
+
+  setTimeout(() => {
+    let astElNode = document.getElementById('ast')
+    if (!astElNode.classList.contains('key-listener')) {
+      astElNode.addEventListener('keypress', keyListener, false)
+      astElNode.classList.add('key-listener')
+    }
+  })
 }
 
 Editor.prototype._processKeyboardEvent = function (e) {
