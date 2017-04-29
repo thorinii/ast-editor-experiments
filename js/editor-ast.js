@@ -1,10 +1,13 @@
-const nodeClass = t => selected => {
-  const cType = ' code-ast-' + t
-  const cBrace = (t === 'brace-left' || t === 'brace-right') ? ' code-ast-brace' : ''
-  const cHighlightable = (t === 'identifier' || t === 'keyword' || t === 'literal') ? ' highlightable' : ''
-  const cSelected = selected ? ' selected' : ''
-  return {className: 'code-ast-node' + cType + cBrace + cHighlightable + cSelected}
+'use strict'
+
+const ifBlock = test => then => otherwise => {
+  const isBlock = test => Array.isArray(test) ? !!test.find(el => isBlock(el)) : test.type === 'div'
+  return isBlock(test) ? then : otherwise
 }
+
+const Array$dropFirst = array => array.slice(1)
+
+const mapIdx = fn => array => array.mA.ap((i, idx) => fn(i)(idx))
 
 const reactElement = type => props => content => {
   let tmp = []
@@ -17,132 +20,126 @@ const reactElement = type => props => content => {
   }
   go(content)
 
+  const React = require('react')
   return React.createElement(type, props, ...tmp)
 }
 
-//
-
-const arrayOf = (...items) => items.reduce((acc, el) => ap('Array$push', acc, el), l([]))
-
-const ifBlock = test => then => otherwise => {
-  const isBlock = test => Array.isArray(test) ? !!test.find(el => isBlock(el)) : test.type === 'div'
-  return isBlock(test) ? then : otherwise
+const nodeClass = t => selected => {
+  const cType = ' code-ast-' + t
+  const cBrace = (t === 'brace-left' || t === 'brace-right') ? ' code-ast-brace' : ''
+  const cHighlightable = (t === 'identifier' || t === 'keyword' || t === 'literal') ? ' highlightable' : ''
+  const cSelected = selected ? ' selected' : ''
+  return {className: 'code-ast-node' + cType + cBrace + cHighlightable + cSelected}
 }
 
-const ifEq = (test, check, then, otherwise) => if_(bin('===', test, check), then, otherwise)
-const if_ = (test, then, otherwise) => caseof(test, l(true), then, any(), otherwise)
+define(['ast-builder'], function (A) {
+  'use strict'
 
-const debugSeq_ = (value) => lets('tmp', value, ap('debugSeq', 'tmp', 'tmp'))
+  const arrayOf = (...items) => items.reduce((acc, el) => A.ap('Array$push', acc, el), A.l([]))
+  const ifEq = (test, check, then, otherwise) => if_(A.bin('===', test, check), then, otherwise)
+  const if_ = (test, then, otherwise) => A.caseof(test, A.l(true), then, A.any(), otherwise)
+  const debugSeq_ = (value) => A.lets('tmp', value, A.ap('debugSeq', 'tmp', 'tmp'))
 
-const Array$dropFirst = array => array.slice(1)
+  return A.lam('cursor', 'ast', A.lets(
 
+    'debugSeq', A.lam('print', 'ret', A.lets(
+      'ignored', A.ap('console.log', 'print'),
+      'ret'
+    )),
 
-const mapIdx = fn => array => array.map((i, idx) => fn(i)(idx))
+    'el', 'reactElement',
 
-var __initialAst = lam('cursor', 'ast', lets(
+    'node', A.lam('type', 'selected', 'content',
+      A.ap('el', A.ap('ifBlock', 'content', A.l('div'), A.l('span')), A.ap('nodeClass', 'type', 'selected'), 'content')),
+    'nodeBlock', A.lam('type', 'selected', 'content',
+      A.ap('el', A.l('div'), A.ap('nodeClass', 'type', 'selected'), 'content')),
 
-  'debugSeq', lam('print', 'ret', lets(
-    'ignored', ap('console.log', 'print'),
-    'ret'
-  )),
+    'newline', A.ap('el', A.l('div'), A.l({}), A.l(null)),
 
-  'el', 'reactElement',
+    'kw', A.lam('word', A.ap('node', A.l('keyword'), A.l(false), 'word')),
+    'id', A.lam('word', 'selected', A.ap('node', A.l('identifier'), 'selected', 'word')),
+    'lit', A.lam('word', 'selected', A.ap('node', A.l('literal'), 'selected', A.ap('htmlEscape', A.ap('JSON.stringify', 'word')))),
 
-  'node', lam('type', 'selected', 'content',
-    ap('el', ap('ifBlock', 'content', l('div'), l('span')), ap('nodeClass', 'type', 'selected'), 'content')),
-    // bin('+', l('<span class="code-ast-node code-ast-'), 'type', l('">'), 'content', l('</span>'))),
-  'nodeBlock', lam('type', 'selected', 'content',
-    ap('el', l('div'), ap('nodeClass', 'type', 'selected'), 'content')),
+    'parenL', A.ap('node', A.l('brace-left'), A.l(false), A.l('(')),
+    'parenR', A.ap('node', A.l('brace-right'), A.l(false), A.l(')')),
 
-  'newline', ap('el', l('div'), l({}), l(null)),
+    'indent', A.lam('content', A.ap('ifBlock', 'content', A.ap('nodeBlock', A.l('indent'), A.l(false), 'content'), 'content')),
 
-  'kw', lam('word', ap('node', l('keyword'), l(false), 'word')),
-  'id', lam('word', 'selected', ap('node', l('identifier'), 'selected', 'word')),
-  'lit', lam('word', 'selected', ap('node', l('literal'), 'selected', ap('htmlEscape', ap('JSON.stringify', 'word')))),
-
-  'parenL', ap('node', l('brace-left'), l(false), l('(')),
-  'parenR', ap('node', l('brace-right'), l(false), l(')')),
-
-  'indent', lam('content', ap('ifBlock', 'content', ap('nodeBlock', l('indent'), l(false), 'content'), 'content')),
-
-
-  'unwrapCursor', lam('unwrapper', 'cursor',
-    if_(bin('||', bin('===', 'cursor', l(null)), bin('===', 'cursor.length', l(0))), l(null),
-      ifEq('unwrapper', 'cursor[0]', ap('Array$dropFirst', 'cursor'), l(null))
-    )
-  ),
-
-
-  /* eslint-disable */
-  'translate', lam('cursor', 'ast',
-    lets(
-      'selected', bin('&&', bin('!==', 'cursor', l(null)), bin('===', 'cursor.length', l(0))),
-
-      caseof('ast.type',
-
-        l('literal'), ap('lit', 'ast.value', 'selected'),
-        l('variable'), ap('id', 'ast.id', 'selected'),
-
-        l('binary'), lets(
-          'all', ap('Array$intersperse', ap('kw', 'ast.op'), ap('mapIdx', lam('a', 'idx', ap('translate', ap('unwrapCursor', 'idx', 'cursor'), 'a')), 'ast.args')),
-          ap('node', l('binary'), 'selected', 'all')
-        ),
-
-        l('let+'), lets(
-          'value', ap('translate', ap('unwrapCursor', l('value'), 'cursor'), 'ast.result'),
-          'joiner', ifEq('ast.bindings.length', l(1), l(''), ap('newline')),
-          'bindings', ap('mapIdx', lam('b', 'idx',
-            arrayOf(ap('id', 'b[0]', l(false)), ap('kw', l('=')), ap('indent', ap('translate', ap('unwrapCursor', l('value'), ap('unwrapCursor', 'idx', 'cursor')), 'b[1]')), 'joiner')
-          ), 'ast.bindings'),
-          ap('node', l('let'), 'selected', arrayOf(
-            ap('kw', l('let')),
-            ap('indent', 'bindings'),
-            ap('kw', l('in')),
-            ap('indent', 'value')
-          ))
-        ),
-
-        l('lambda'), lets(
-          'value', ap('translate', ap('unwrapCursor', l('value'), 'cursor'), 'ast.value'),
-          ap('node', l('lambda'), 'selected', arrayOf(
-            ap('kw', l('λ')),
-            ap('id', 'ast.arg', l(false)),
-            ap('kw', l('→')),
-            ap('indent', 'value')
-          ))
-        ),
-
-        l('apply'), lets(
-          'fn', ap('translate', ap('unwrapCursor', l('fn'), 'cursor'), 'ast.fn'),
-          'arg', ap('translate', ap('unwrapCursor', l('arg'), 'cursor'), 'ast.arg'),
-          ap('node', l('apply'), 'selected', arrayOf(
-            'fn', 'parenL', 'arg', 'parenR'
-          ))
-        ),
-
-        l('pattern'), lets(
-          'arg', ap('translate', ap('unwrapCursor', l('arg'), 'cursor'), 'ast.arg'),
-          'cases', ap('mapIdx', lam('b', 'idx', lets(
-            'pattern', caseof('b[0].type',
-              l('literal'), ap('lit', 'b[0].value', l(false)),
-              l('any'), ap('id', l('_'), l(false)),
-              any(), ap('debugSeq', 'b[0]', ap('id', 'b[0]', l(false)))
-            ),
-            arrayOf('pattern', ap('kw', l('→')), ap('indent', ap('translate', ap('unwrapCursor', l('value'), ap('unwrapCursor', 'idx', 'cursor')), 'b[1]')), 'newline'))
-          ), 'ast.cases'),
-          ap('node', l('apply'), 'selected', arrayOf(
-            ap('kw', l('case')),
-            'arg',
-            ap('kw', l('of')),
-            ap('indent', 'cases')
-          ))
-        ),
-
-        any(), ap('debugSeq', 'ast', ap('node', l('unknown'), 'selected', l('UNKNOWN')))
+    'unwrapCursor', A.lam('unwrapper', 'cursor',
+      if_(A.bin('||', A.bin('===', 'cursor', A.l(null)), A.bin('===', 'cursor.length', A.l(0))), A.l(null),
+        ifEq('unwrapper', 'cursor[0]', A.ap('Array$dropFirst', 'cursor'), A.l(null))
       )
-    )
-  ),
+    ),
 
+    'translate', A.lam('cursor', 'ast',
+      A.lets(
+        'selected', A.bin('&&', A.bin('!==', 'cursor', A.l(null)), A.bin('===', 'cursor.length', A.l(0))),
 
-  ap('translate', 'cursor', ap('scrollLets', ap('sugarifyLet', 'ast')))
-))
+        A.caseof('ast.type',
+
+          A.l('literal'), A.ap('lit', 'ast.value', 'selected'),
+          A.l('variable'), A.ap('id', 'ast.id', 'selected'),
+
+          A.l('binary'), A.lets(
+            'all', A.ap('Array$intersperse', A.ap('kw', 'ast.op'), A.ap('mapIdx', A.lam('a', 'idx', A.ap('translate', A.ap('unwrapCursor', 'idx', 'cursor'), 'a')), 'ast.args')),
+            A.ap('node', A.l('binary'), 'selected', 'all')
+          ),
+
+          A.l('let+'), A.lets(
+            'value', A.ap('translate', A.ap('unwrapCursor', A.l('value'), 'cursor'), 'ast.result'),
+            'joiner', ifEq('ast.bindings.length', A.l(1), A.l(''), A.ap('newline')),
+            'bindings', A.ap('mapIdx', A.lam('b', 'idx',
+              arrayOf(A.ap('id', 'b[0]', A.l(false)), A.ap('kw', A.l('=')), A.ap('indent', A.ap('translate', A.ap('unwrapCursor', A.l('value'), A.ap('unwrapCursor', 'idx', 'cursor')), 'b[1]')), 'joiner')
+            ), 'ast.bindings'),
+            A.ap('node', A.l('let'), 'selected', arrayOf(
+              A.ap('kw', A.l('let')),
+              A.ap('indent', 'bindings'),
+              A.ap('kw', A.l('in')),
+              A.ap('indent', 'value')
+            ))
+          ),
+
+          A.l('lambda'), A.lets(
+            'value', A.ap('translate', A.ap('unwrapCursor', A.l('value'), 'cursor'), 'ast.value'),
+            A.ap('node', A.l('lambda'), 'selected', arrayOf(
+              A.ap('kw', A.l('λ')),
+              A.ap('id', 'ast.arg', A.l(false)),
+              A.ap('kw', A.l('→')),
+              A.ap('indent', 'value')
+            ))
+          ),
+
+          A.l('apply'), A.lets(
+            'fn', A.ap('translate', A.ap('unwrapCursor', A.l('fn'), 'cursor'), 'ast.fn'),
+            'arg', A.ap('translate', A.ap('unwrapCursor', A.l('arg'), 'cursor'), 'ast.arg'),
+            A.ap('node', A.l('apply'), 'selected', arrayOf(
+              'fn', 'parenL', 'arg', 'parenR'
+            ))
+          ),
+
+          A.l('pattern'), A.lets(
+            'arg', A.ap('translate', A.ap('unwrapCursor', A.l('arg'), 'cursor'), 'ast.arg'),
+            'cases', A.ap('mapIdx', A.lam('b', 'idx', A.lets(
+              'pattern', A.caseof('b[0].type',
+                A.l('literal'), A.ap('lit', 'b[0].value', A.l(false)),
+                A.l('any'), A.ap('id', A.l('_'), A.l(false)),
+                A.any(), A.ap('debugSeq', 'b[0]', A.ap('id', 'b[0]', A.l(false)))
+              ),
+              arrayOf('pattern', A.ap('kw', A.l('→')), A.ap('indent', A.ap('translate', A.ap('unwrapCursor', A.l('value'), A.ap('unwrapCursor', 'idx', 'cursor')), 'b[1]')), 'newline'))
+            ), 'ast.cases'),
+            A.ap('node', A.l('apply'), 'selected', arrayOf(
+              A.ap('kw', A.l('case')),
+              'arg',
+              A.ap('kw', A.l('of')),
+              A.ap('indent', 'cases')
+            ))
+          ),
+
+          A.any(), A.ap('debugSeq', 'ast', A.ap('node', A.l('unknown'), 'selected', A.l('UNKNOWN')))
+        )
+      )
+    ),
+
+    A.ap('translate', 'cursor', A.ap('scrollLets', A.ap('sugarifyLet', 'ast')))
+  ))
+})
