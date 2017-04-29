@@ -32,6 +32,67 @@ const nodeClass = t => selected => {
   return {className: 'code-ast-node' + cType + cBrace + cHighlightable + cSelected}
 }
 
+function Fn$bind1 (fn) {
+  return function (_this) {
+    return function (a) {
+      return fn.call(_this, a)
+    }
+  }
+}
+
+function Fn$apply3 (fn) {
+  return a => b => c => fn(a, b, c)
+}
+
+function Array$join (joiner) {
+  return function (array) {
+    return array.join(joiner)
+  }
+}
+
+function Array$push (array) {
+  return function (item) {
+    return array.concat([item])
+  }
+}
+
+function Array$intersperse (item) {
+  return function (array) {
+    let ret = []
+    array.forEach((itm, idx) => {
+      if (idx > 0) ret.push(item)
+      ret.push(itm)
+    })
+    return ret
+  }
+}
+
+function map (fn) {
+  return function (array) {
+    return array.map((i) => fn(i))
+  }
+}
+
+function foldL (fn) {
+  return function (zero) {
+    return function (array) {
+      return array.reduce((acc, i) => fn(acc)(i), zero)
+    }
+  }
+}
+
+function foldR (fn) {
+  return function (zero) {
+    return function (array) {
+      return array.reduceRight((acc, i) => fn(acc)(i), zero)
+    }
+  }
+}
+
+function htmlEscape (html) {
+  return html.split('<').join('&lt;')
+}
+
 define(['ast-builder'], function (A) {
   'use strict'
 

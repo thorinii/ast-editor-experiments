@@ -1,4 +1,4 @@
-define(['react', 'react-dom'], function (React, ReactDOM) {
+define(['react', 'react-dom', 'bootstrap-compiler'], function (React, ReactDOM, Bootstrap) {
   'use strict'
 
   function Editor (el) {

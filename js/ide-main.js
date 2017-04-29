@@ -9,7 +9,7 @@ require.config({
       exports: '__initialAst'
     },
     'main': {
-      deps: ['react'],
+      deps: ['react', 'ast-operators'],
       exports: 'nothing'
     }
   }
