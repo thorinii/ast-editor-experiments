@@ -1,18 +1,5 @@
-/* globals require */
-
 require.config({
-  baseUrl: 'js',
-
-  shim: {
-    'editor-ast': {
-      deps: ['main'],
-      exports: '__initialAst'
-    },
-    'main': {
-      deps: ['react', 'ast-operators'],
-      exports: 'nothing'
-    }
-  }
+  baseUrl: 'js'
 })
 
 define(['editor', 'editor-ast'], function (Editor, __initialAst) {

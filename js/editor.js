@@ -1,4 +1,4 @@
-define(['react', 'react-dom', 'bootstrap-compiler'], function (React, ReactDOM, Bootstrap) {
+define(['react', 'react-dom', 'bootstrap-compiler', 'ast-render-react'], function (React, ReactDOM, Bootstrap, AstRenderReact) {
   'use strict'
 
   function Editor (el) {
@@ -36,7 +36,7 @@ define(['react', 'react-dom', 'bootstrap-compiler'], function (React, ReactDOM, 
     let statusEl = e('div', {className: 'message'}, state.status)
 
     let astEl = e('div', {id: 'ast', className: 'code-text', tabIndex: 0},
-      ...tryFn(() => PP.printHtml(state.ast), e => ['' + e]))
+      ...tryFn(() => AstRenderReact.render(state.ast), e => ['' + e]))
     let debugOutJsEl = e('div', {className: 'code-text'},
       tryFn(() => Bootstrap.translate(state.ast), e => '' + e))
     let debugOutAstJsonEl = e('div', {className: 'code-text'},
@@ -183,6 +183,10 @@ define(['react', 'react-dom', 'bootstrap-compiler'], function (React, ReactDOM, 
       modifiers: modifiers,
       string: string
     }
+  }
+
+  function compile (js) {
+    return eval('(' + js + ')') // eslint-disable-line
   }
 
   return Editor

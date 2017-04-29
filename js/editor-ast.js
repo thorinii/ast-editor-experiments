@@ -93,6 +93,10 @@ function htmlEscape (html) {
   return html.split('<').join('&lt;')
 }
 
+function _$throw (e) {
+  throw e
+}
+
 define(['ast-builder'], function (A) {
   'use strict'
 

@@ -1,5 +1,5 @@
 {
   "standard": {
-    "globals": ["define"]
+    "globals": ["define", "require"]
   }
 }
