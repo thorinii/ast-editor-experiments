@@ -27,12 +27,11 @@ There is no usage yet.
 
 ## TODO
 
-* Don't swallow Ctrl-R
+* Use Require.js
+  * Split into React components
 * Use JS handler to render the AST
   * Add cursor rendering
   * Use React pure components?
-* Use Require.js
-  * Split into React components
 * Render a keymap chart
   * Based on the actual keybinding table
 * Immutable state & dispatch/reducer system

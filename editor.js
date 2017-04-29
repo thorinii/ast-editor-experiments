@@ -24,10 +24,11 @@ Editor.prototype._scheduleRender = function () {
 Editor.prototype._render = function (el, state) {
   const e = React.createElement
 
-  const keyListener = pipe(
-    e => { e.preventDefault(); return e },
-    translateKeyEvent,
-    e => this._processKeyboardEvent(e))
+  const keyListener = e => {
+    const key = translateKeyEvent(e)
+    const prevent = this._processKeyboardEvent(key)
+    if (prevent) e.preventDefault()
+  }
 
   const tryFn = (fn, error) => { try { return fn() } catch (e) { return error(e) } }
 
@@ -49,37 +50,54 @@ Editor.prototype._render = function (el, state) {
 
   ReactDOM.render(editorContainer, el)
 
-  setTimeout(() => {
-    let astElNode = document.getElementById('ast')
-    if (!astElNode.classList.contains('key-listener')) {
-      astElNode.addEventListener('keypress', keyListener, false)
-      astElNode.classList.add('key-listener')
-    }
-  })
+  if (!el.classList.contains('key-listener')) {
+    el.addEventListener('keypress', keyListener, false)
+    el.classList.add('key-listener')
+  }
 }
 
 Editor.prototype._processKeyboardEvent = function (e) {
-  if (e.key === '<space>' && e.modifiers.length === 0) {
-    this._state.ast = {
-      type: 'apply',
-      fn: this._state.ast,
-      arg: {type: 'hole'}
-    }
-  } else if (e.key === '.' && e.modifiers.length === 0) {
-    this._state.ast = {
-      type: 'apply',
-      fn: {type: 'hole'},
-      arg: this._state.ast
-    }
-  } else if (e.key === 'l' && e.modifiers.length === 0) {
-    this._state.cursor = relativeLeaf(this._state.ast, this._state.cursor, 1)
-  } else if (e.key === 'h' && e.modifiers.length === 0) {
-    this._state.cursor = relativeLeaf(this._state.ast, this._state.cursor, -1)
-  } else {
-    console.log(e)
+  switch (e.string) {
+    case 'ctrl + r':
+    case 'ctrl + shift + r':
+    case 'f5':
+    case 'ctrl + f5':
+      return false
+
+    case '<space>':
+      this._state.ast = {
+        type: 'apply',
+        fn: this._state.ast,
+        arg: {type: 'hole'}
+      }
+      break
+
+    case '.':
+      this._state.ast = {
+        type: 'apply',
+        fn: {type: 'hole'},
+        arg: this._state.ast
+      }
+      break
+
+    case 'l':
+    case '<left>':
+      this._state.cursor = relativeLeaf(this._state.ast, this._state.cursor, 1)
+      break
+
+    case 'h':
+    case '<right>':
+      this._state.cursor = relativeLeaf(this._state.ast, this._state.cursor, -1)
+      break
+
+    default:
+      console.log(e)
+      break
   }
 
   this._scheduleRender()
+
+  return true
 }
 
 function relativeLeaf (ast, cursor, offset) {
