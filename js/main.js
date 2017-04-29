@@ -1,103 +1,5 @@
 'use strict'
 
-function runTests (test) {
-  var test1 =
-    ap(
-      lam('x', bin('*', 'x', l(8))),
-      bin('+', l(4), l(5)))
-
-  var test2 =
-    lam('ast', lets(
-
-      'translate', lam('ast',
-        caseof('ast.type',
-          l('literal'), ap('JSON.stringify', 'ast.value'),
-          l('variable'), v('ast.id'),
-
-          l('binary'), ap(ap('Array$join', bin('+', l(' '), 'ast.op', l(' '))), ap('ast.args.map', lam('a', ap('translateP', 'a')))),
-
-          l('lambda'), bin('+', l('function('), 'ast.arg', l('){return '), ap('translate', 'ast.value'), l('}')),
-
-          l('apply'), bin('+', ap('translateP', 'ast.fn'), l('('), ap('translate', 'ast.arg'), l(')')),
-
-          l('let'), bin('+', l('(function(){var '), 'ast.binding', l(' = '), ap('translate', 'ast.value'), l('; return '), ap('translate', 'ast.result'), l('})()')),
-
-          l('let+'), bin('+',
-            l('(function(){'),
-            ap('foldR',
-              lam('acc', 'b',
-                bin('+', l('var '), 'b[0]', l(' = '), ap('translate', 'b[1]'), l(';'), 'acc')),
-              bin('+', l('return '), ap('translate', 'ast.result')),
-              'ast.bindings'),
-            l('})()')),
-
-          l('pattern'), lets(
-            'casesBlock',
-              ap('foldR',
-                lam('tmp', 'c', lets(
-                  'condition', caseof('c[0].type',
-                    l('any'), l('true'),
-                    l('literal'), bin('+', l('_$m === '), ap('JSON.stringify', 'c[0].value')),
-                    any(), l('UNKNOWN')),
-                  caseof('condition',
-                    l('true'), ap('translateP', 'c[1]'),
-                    any(), bin('+', 'condition', l(' ? '), ap('translateP', 'c[1]'), l(' : '), 'tmp')))),
-                l('_$throw(new Error("Unmatched case: " + JSON.stringify(_$m)))'),
-                'ast.cases'),
-            bin('+', l('(function(_$m){return '), 'casesBlock', l('})('), ap('translate', 'ast.arg'), l(')')))
-        )),
-
-      'translateP', lam('ast',
-        caseof('ast.type',
-          l('lambda'), bin('+', l('('), ap('translate', 'ast'), l(')')),
-          l('binary'), bin('+', l('('), ap('translate', 'ast'), l(')')),
-          any(), ap('translate', 'ast')
-        )),
-
-      ap('translate', ap('scrollLets', ap('sugarifyLet', 'ast')))))
-
-  // TODO: accumulate nested Apply, Lets, Lambda args
-
-  {
-    console.log('TEST 1: simple lambdas and application')
-    console.log(PP.print(test1))
-    console.log(Bootstrap.translate(test1))
-    let compiled = compile(Bootstrap.translate(test1))
-    console.log(compiled)
-    console.log('->  ' + (compiled === 72 ? 'SUCCESS' : 'FAILED'))
-  }
-
-  {
-    console.log('TEST 2: a JS translator')
-    console.log(PP.print(test2))
-    console.log(Bootstrap.translate(test2))
-    let testTranslateJs = Bootstrap.translate(test2)
-    let testTranslate = compile(testTranslateJs)
-
-    console.log('Can compile Test 1?')
-    let resultTest1 = testTranslate(test1)
-    let expectedTest1 = Bootstrap.translate(test1)
-    console.log('->  ' + (resultTest1 === expectedTest1 ? 'SUCCESS' : 'FAILED'))
-
-    console.log('Can compile itself?')
-    let resultTest2 = testTranslate(test2)
-    let expectedTest2 = testTranslateJs
-    console.log('->  ' + (resultTest2 === expectedTest2 ? 'SUCCESS' : 'FAILED'))
-  }
-
-  {
-    console.log('TEST 3: a JS translator translated five times')
-    let deTranslata = Bootstrap.translate.bind(Bootstrap)
-    let initialJs = deTranslata(test2)
-    for (let i = 0; i < 5; i++) {
-      let result = deTranslata(test2)
-      deTranslata = compile(result)
-    }
-    let finalJs = deTranslata(test2)
-    console.log('->  ' + (finalJs === initialJs ? 'SUCCESS' : 'FAILED'))
-  }
-}
-
 var Bootstrap = {
   translate: function (ast) {
     ast = scrollLets(sugarifyLet(ast))
@@ -432,6 +334,7 @@ var PP = {
   _renderHtml: function (layout) {
     if (Array.isArray(layout)) return this._flattenArray(layout.map(l => this._renderHtml(l)))
 
+    const React = require('react')
     const el = React.createElement
 
     switch (layout.type) {

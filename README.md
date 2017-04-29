@@ -28,6 +28,7 @@ There is no usage yet.
 ## TODO
 
 * Use Require.js
+  * Split into Editor Render, Editor Keyboard, AST, AST rendering
   * Split into React components
 * Use JS handler to render the AST
   * Add cursor rendering
@@ -35,7 +36,10 @@ There is no usage yet.
 * Render a keymap chart
   * Based on the actual keybinding table
 * Immutable state & dispatch/reducer system
+  * Use Object.freeze
 * Asynchronous compilation
+  * Compile and test the code
+    * Render the result in an output pane
 * Better one-line rendering support (use complexity or approximate length)
 * More rolling up of nested things (in the core AST as well)
   * Lambda
@@ -48,7 +52,10 @@ There is no usage yet.
   * Variable
   * Literals
 * Database/serialisation
+  * A NodeJS server
+  * Move to WebPack
   * Use LevelDB (https://github.com/Level/level) with encoding=json
+  * Support multiple top-levels
 * Use AST functions to execute commands
   * An abstract Editor Hooks function
 * Mouse
@@ -129,22 +136,3 @@ There is no usage yet.
   * Keyboard command processing
 * ' ' on an expression to call it as a function
 * '.' on an expression to call a function with it
-
-* Use require.js modules to construct the editor
-  * Use an anonymous require in the HTML to instantiate everything
-  * defines for everything else
-* Nope, use webpack
-* Try require.js first. It works on dead servers. Webpack is compatible with it.
-* Eventually we’ll need a Node.js backing so Webpack can come alive then
-
-* Wrap in modules
-* Don’t use the AST function to render
-  * Quicker development with just JS. And most of the rest of the editor is JS
-  * We don’t have a way to save yet
-  * Rewrite PP.toHtml function to take a cursor
-    * Use React functional components
-    * Use keyed let/binary/pattern/etc things
-  * Instead develop against an AST that makes a value (and render the value)
-* Add support for multiple top-levels
-* Collect all documentation in a document like the README
-* Use Object.freeze when we get to immutability
