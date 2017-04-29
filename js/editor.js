@@ -1,4 +1,4 @@
-define(['react', 'react-dom', 'bootstrap-compiler', 'ast-render-react'], function (React, ReactDOM, Bootstrap, AstRenderReact) {
+define(['react', 'react-dom', 'editor-render', 'ast-operators'], function (React, ReactDOM, EditorRender, AstOps) {
   'use strict'
 
   function Editor (el) {
@@ -23,34 +23,19 @@ define(['react', 'react-dom', 'bootstrap-compiler', 'ast-render-react'], functio
   }
 
   Editor.prototype._render = function (el, state) {
-    const e = React.createElement
-
-    const keyListener = e => {
-      const key = translateKeyEvent(e)
-      const prevent = this._processKeyboardEvent(key)
-      if (prevent) e.preventDefault()
-    }
-
-    const tryFn = (fn, error) => { try { return fn() } catch (e) { return error(e) } }
-
-    let statusEl = e('div', {className: 'message'}, state.status)
-
-    let astEl = e('div', {id: 'ast', className: 'code-text', tabIndex: 0},
-      ...tryFn(() => AstRenderReact.render(state.ast), e => ['' + e]))
-    let debugOutJsEl = e('div', {className: 'code-text'},
-      tryFn(() => Bootstrap.translate(state.ast), e => '' + e))
-    let debugOutAstJsonEl = e('div', {className: 'code-text'},
-      tryFn(() => false ? JSON.stringify(state.ast, null, '  ') : '', e => '' + e))
-
-    let editorContainer = e('div', {},
-      statusEl,
-      e('div', {className: 'container container-2-columns'},
-        e('div', {className: 'pane'}, astEl),
-        e('div', {className: 'pane'}, debugOutJsEl)),
-      debugOutAstJsonEl)
-
+    let editorContainer = React.createElement(EditorRender.editor, {state: state})
     ReactDOM.render(editorContainer, el)
 
+    const keyListener = e => {
+      try {
+        const key = translateKeyEvent(e)
+        const prevent = this._processKeyboardEvent(key)
+        if (prevent) e.preventDefault()
+      } catch (e) {
+        console.error(e)
+        e.preventDefault()
+      }
+    }
     if (!el.classList.contains('key-listener')) {
       el.addEventListener('keypress', keyListener, false)
       el.classList.add('key-listener')
@@ -139,7 +124,7 @@ define(['react', 'react-dom', 'bootstrap-compiler', 'ast-render-react'], functio
       }
     }
 
-    const cursors = findCursors(scrollLets(sugarifyLet(ast)))
+    const cursors = findCursors(AstOps.scrollLets(AstOps.sugarifyLet(ast)))
     const currentIndex = cursors.findIndex(c => JSON.stringify(c) === JSON.stringify(cursor))
 
     const nextIndex = Math.max(0, Math.min(cursors.length - 1, currentIndex + offset))

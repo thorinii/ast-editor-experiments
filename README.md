@@ -27,9 +27,6 @@ There is no usage yet.
 
 ## TODO
 
-* Use Require.js
-  * Split into Editor Render, Editor Keyboard, AST, AST rendering
-  * Split into React components
 * Use JS handler to render the AST
   * Add cursor rendering
   * Use React pure components?
