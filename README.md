@@ -27,9 +27,6 @@ There is no usage yet.
 
 ## TODO
 
-* Use JS handler to render the AST
-  * Add cursor rendering
-  * Use React pure components?
 * Render a keymap chart
   * Based on the actual keybinding table
 * Immutable state & dispatch/reducer system
@@ -37,6 +34,7 @@ There is no usage yet.
 * Asynchronous compilation
   * Compile and test the code
     * Render the result in an output pane
+  * Status message is derived from the queue
 * Better one-line rendering support (use complexity or approximate length)
 * More rolling up of nested things (in the core AST as well)
   * Lambda

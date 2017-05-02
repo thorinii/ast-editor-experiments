@@ -67,12 +67,12 @@ define(['react', 'react-dom', 'editor-render', 'ast-operators'], function (React
         break
 
       case 'l':
-      case '<left>':
+      case '<right>':
         this._state.cursor = relativeLeaf(this._state.ast, this._state.cursor, 1)
         break
 
       case 'h':
-      case '<right>':
+      case '<left>':
         this._state.cursor = relativeLeaf(this._state.ast, this._state.cursor, -1)
         break
 
@@ -91,6 +91,7 @@ define(['react', 'react-dom', 'editor-render', 'ast-operators'], function (React
       (arrayOfArrays.length === 0) ? [[el]] : arrayOfArrays.map(a => [el].concat(a))
     const findCursors = ast => {
       switch (ast.type) {
+        case 'hole': return []
         case 'literal': return []
         case 'variable': return []
 

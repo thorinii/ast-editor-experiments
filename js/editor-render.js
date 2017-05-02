@@ -5,7 +5,7 @@ define(['react', 'ast-render-react', 'bootstrap-compiler'], function (React, Ast
   const AstView = props => e(
     'div',
     {className: 'code-text', tabIndex: 0},
-    ...tryFn(() => AstRenderReact.render(props.ast), e => ['' + e]))
+    tryFn(() => AstRenderReact.render(props.cursor, props.ast), e => ['' + e]))
 
   const CompiledJsView = props => e(
     'div',
@@ -21,7 +21,7 @@ define(['react', 'ast-render-react', 'bootstrap-compiler'], function (React, Ast
       return e('div', {},
         statusEl,
         e('div', {className: 'container container-2-columns'},
-          e('div', {className: 'pane'}, e(AstView, {ast: state.ast})),
+          e('div', {className: 'pane'}, e(AstView, {ast: state.ast, cursor: state.cursor})),
           e('div', {className: 'pane'}, e(CompiledJsView, {ast: state.ast}))))
     }
   }
