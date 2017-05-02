@@ -31,26 +31,28 @@ There is no usage yet.
   * Based on the actual keybinding table
 * Immutable state & dispatch/reducer system
   * Use Object.freeze
+  * Use dispatchers in KeyMap
+    * Split into KeyMap and DefaultKeyMapConfig
 * Asynchronous compilation
   * Compile and test the code
     * Render the result in an output pane
   * Status message is derived from the queue
-* Better one-line rendering support (use complexity or approximate length)
+* Implement more commands
+  * Variable
+  * Literals
 * More rolling up of nested things (in the core AST as well)
   * Lambda
   * Apply
   * Remove 'let' replace with 'let+' renamed
+* Support multiple top-levels
+* Better one-line rendering support (use complexity or approximate length)
 * More intelligent parenthesis
-* Array/object literals (use a helper method)
+* Array/object literals
 * Keyboard command binding (use proper key-binding system)
-* Implement more commands
-  * Variable
-  * Literals
 * Database/serialisation
   * A NodeJS server
   * Move to WebPack
   * Use LevelDB (https://github.com/Level/level) with encoding=json
-  * Support multiple top-levels
 * Use AST functions to execute commands
   * An abstract Editor Hooks function
 * Mouse

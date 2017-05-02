@@ -61,7 +61,7 @@ textarea.code:focus {
   margin-left: 15px;
 }
 
-.code-ast-keyword, .code-ast-identifier, .code-ast-literal, .code-ast-brace {
+.code-ast-keyword, .code-ast-identifier, .code-ast-literal {
   padding: 0 0.4em;
 }
 .code-ast-keyword {
@@ -77,10 +77,12 @@ textarea.code:focus {
   color: #939393;
 }
 .code-ast-brace-left {
-  margin-right: -0.6em;
+  padding-left: 0.4em;
+  margin-right: -0.4em;
 }
 .code-ast-brace-right {
-  margin-left: -0.6em;
+  margin-left: -0.4em;
+  padding-right: 0.4em;
 }
 
 .code-ast:hover {

@@ -119,7 +119,9 @@ define(['ast-operators', 'react'], function (AstOps, React) {
         const arg = translate(unwrapCursor('arg', cursor), ast.arg)
         const needsParens = ['binary', 'lambda', 'apply'].indexOf(ast.arg.type) !== -1
         return node('apply', selected,
-          needsParens ? [fn, parenL, arg, parenR] : [fn, arg])
+          ifBlock(arg,
+            [fn, indent(arg)],
+            needsParens ? [fn, parenL, arg, parenR] : [fn, arg]))
       }
 
       case 'pattern': {
