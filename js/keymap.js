@@ -47,6 +47,44 @@ define(['ast-operators'], function (AstOps) {
     return cursors[nextIndex]
   }
 
+  const bindings = [
+    {
+      key: '<space>',
+      action: {
+        description: 'Call the current expression as a function',
+        fn: state => state.ast = {type: 'apply', fn: state.ast, arg: {type: 'hole'}}
+      }
+    }, {
+      key: '.',
+      action: {
+        description: 'Call a function with the current expression',
+        fn: state => state.ast = {type: 'apply', fn: {type: 'hole'}, arg: state.ast}
+      }
+    },
+
+    {
+      key: 'l',
+      action: {
+        description: 'Move to the next leaf node',
+        fn: state => state.cursor = relativeLeaf(state.ast, state.cursor, 1)
+      }
+    }, {
+      key: 'h',
+      action: {
+        description: 'Move to the previous leaf node',
+        fn: state => state.cursor = relativeLeaf(state.ast, state.cursor, -1)
+      }
+    },
+
+    { key: '<right>', ref: 'l' },
+    { key: '<left>', ref: 'h' }
+  ]
+
+  const actions = bindings.reduce((acc, binding) => {
+    acc[binding.key] = binding.action ? binding.action.fn : binding.ref
+    return acc
+  }, {})
+
   return {
     isPassthrough: function (e) { return this.passthrough.indexOf(e.string) !== -1 },
     getAction: function (e) {
@@ -63,15 +101,7 @@ define(['ast-operators'], function (AstOps) {
       'f5', 'ctrl + f5'
     ],
 
-    actions: {
-      '<space>': state => state.ast = {type: 'apply', fn: state.ast, arg: {type: 'hole'}},
-      '.': state => state.ast = {type: 'apply', fn: {type: 'hole'}, arg: state.ast},
-
-      'l': state => state.cursor = relativeLeaf(state.ast, state.cursor, 1),
-      '<right>': 'l',
-
-      'h': state => state.cursor = relativeLeaf(state.ast, state.cursor, -1),
-      '<left>': 'h'
-    }
+    bindings: bindings,
+    actions: actions
   }
 })

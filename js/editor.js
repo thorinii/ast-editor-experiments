@@ -23,7 +23,10 @@ define(['react', 'react-dom', 'editor-render', 'keymap'], function (React, React
   }
 
   Editor.prototype._render = function (el, state) {
-    let editorContainer = React.createElement(EditorRender.editor, {state: state})
+    let editorContainer = React.createElement(EditorRender.editor, {
+      state: state,
+      keyMap: KeyMap
+    })
     ReactDOM.render(editorContainer, el)
 
     const keyListener = e => {

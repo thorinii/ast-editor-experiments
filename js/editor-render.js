@@ -1,4 +1,4 @@
-define(['react', 'ast-render-react', 'bootstrap-compiler'], function (React, AstRenderReact, Bootstrap) {
+define(['react', 'ast-render-react', 'bootstrap-compiler', 'keymap-chart', 'ui-components'], function (React, AstRenderReact, Bootstrap, KeyMapChart, UI) {
   const e = React.createElement
   const tryFn = (fn, error) => { try { return fn() } catch (e) { return error(e) } }
 
@@ -16,13 +16,25 @@ define(['react', 'ast-render-react', 'bootstrap-compiler'], function (React, Ast
     editor: props => {
       const state = props.state
 
-      let statusEl = e('div', {className: 'message'}, state.status)
+      const pane = e('div', {className: 'pane'}, e(AstView, {ast: state.ast, cursor: state.cursor}))
+
+      const sidebar = e('div', {className: 'sidebar'},
+        e(UI.pane, {
+          type: 'status pane-noseparator',
+          body: e('div', {className: 'message info'}, state.status)
+        }),
+        e(UI.pane, {
+          title: 'Instructions',
+          body: e('div', {}, 'Click on the code to activate key commands')
+        }),
+        e(KeyMapChart.render, {keyMap: props.keyMap}),
+        e(UI.pane, {
+          title: 'Compiled JS',
+          body: e(CompiledJsView, {ast: state.ast})
+        }))
 
       return e('div', {},
-        statusEl,
-        e('div', {className: 'container container-2-columns'},
-          e('div', {className: 'pane'}, e(AstView, {ast: state.ast, cursor: state.cursor})),
-          e('div', {className: 'pane'}, e(CompiledJsView, {ast: state.ast}))))
+        e('div', {className: 'container'}, pane, sidebar))
     }
   }
 })

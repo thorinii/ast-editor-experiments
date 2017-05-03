@@ -2,29 +2,49 @@ div, * {
   box-sizing: border-box;
 }
 
-body {
+html, body {
   margin: 0;
+  height: 100%;
 }
 
 .container {
-}
-
-.container-2-columns {
   display: flex;
   flex-direction: row;
 }
-.container-2-columns .pane {
+
+.container > div {
   flex-basis: 0;
   flex-grow: 1;
-  /*height: 100%;*/
   padding: 10px;
-  max-width: 50%;
 }
+
+.container > .sidebar {
+  flex-basis: auto;
+  flex-grow: 0;
+  width: 500px;
+}
+
+
+.sidebar .pane {
+  margin-bottom: 16px;
+  border-top: 2px solid #BBB;
+}
+.sidebar .pane.pane-noseparator {
+  border-top: 0;
+}
+
+.sidebar .pane h2 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  padding-top: 2px;
+
+  text-transform: lowercase;
+}
+
 
 textarea.code {
   width: 100%;
   height: 100%;
-  font-size: 0.8em;
 
   resize: vertical;
 
@@ -41,20 +61,17 @@ textarea.code:focus {
   font-family: monospace;
   white-space: pre-wrap;
   overflow-x: auto;
-  font-size: 0.8em;
   color: #BBB;
 }
 
 
 .editor {
-  background-color: #2e2e39;
   min-height: 100%;
-}
 
-.editor .message {
-  background-color: #551111;
-  color: #EEEEEE;
-  padding: 5px;
+  background-color: #2e2e39;
+  color: #BBB;
+
+  font-size: 0.8em;
 }
 
 .code-ast-indent {
@@ -94,4 +111,40 @@ textarea.code:focus {
 
 .code-ast-node.selected {
   background-color: #3b4509;
+}
+
+
+key {
+  display: inline-block;
+
+  padding: 4px;
+  margin-right: 6px;
+  margin-left: 6px;
+  border-radius: 6px;
+
+  box-shadow: 0px 0px 2px #2d0404;
+  background-color: #1b0635;
+  color: #A397C9;
+}
+
+
+.pane-keymap ul {
+  padding-left: 0;
+  list-style: none;
+}
+
+
+.editor .message {
+  color: #EEEEEE;
+  padding: 5px;
+  border-radius: 2px;
+}
+.editor .message.info {
+  background-color: #578d1e;
+}
+.editor .message.warn {
+  background-color: #8d741e;
+}
+.editor .message.error {
+  background-color: #8d1e1e;
 }

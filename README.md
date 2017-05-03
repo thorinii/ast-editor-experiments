@@ -27,12 +27,10 @@ There is no usage yet.
 
 ## TODO
 
-* Render a keymap chart
-  * Based on the actual keybinding table
 * Immutable state & dispatch/reducer system
   * Use Object.freeze
   * Use dispatchers in KeyMap
-    * Split into KeyMap and DefaultKeyMapConfig
+    * Split into KeyMap, CursorHandling, and DefaultKeyMapConfig
 * Asynchronous compilation
   * Compile and test the code
     * Render the result in an output pane
@@ -45,9 +43,9 @@ There is no usage yet.
   * Apply
   * Remove 'let' replace with 'let+' renamed
 * Support multiple top-levels
-* Better one-line rendering support (use complexity or approximate length)
-* More intelligent parenthesis
 * Array/object literals
+* Fix editor pane layout/wrapping etc. Either fix the flexbox or use something else.
+* Better one-line rendering support (use complexity or approximate length)
 * Keyboard command binding (use proper key-binding system)
 * Database/serialisation
   * A NodeJS server
