@@ -1,8 +1,9 @@
 define([], function () {
-  function StateContainer (initial) {
-    this._listener = null
+  function StateContainer (initial, reducer) {
     this._state = initial
-    this._queue = []
+    this._reducer = reducer
+    this._listener = null
+    this._actionQueue = []
   }
 
   StateContainer.prototype.setListener = function (listener) {
@@ -14,8 +15,8 @@ define([], function () {
     return this._state
   }
 
-  StateContainer.prototype.dispatch = function (transformer) {
-    this._queue.push(transformer)
+  StateContainer.prototype.dispatch = function (action) {
+    this._actionQueue.push(action)
     this._schedule()
   }
 
@@ -29,8 +30,8 @@ define([], function () {
   }
 
   StateContainer.prototype._execute = function () {
-    this._state = this._queue.reduce((acc, t) => t(acc), this._state)
-    this._queue = []
+    this._state = this._actionQueue.reduce((state, action) => this._reducer(state, action), this._state)
+    this._actionQueue = []
     this._listener(this._state)
   }
 

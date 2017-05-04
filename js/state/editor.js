@@ -1,4 +1,4 @@
-define(['state/state-container', 'state/keymap'], function (StateContainer, KeyMap) {
+define(['state/state-container', 'state/transformers', 'state/keymap'], function (StateContainer, Transformers, KeyMap) {
   'use strict'
 
   const initialState = Object.freeze({
@@ -12,23 +12,19 @@ define(['state/state-container', 'state/keymap'], function (StateContainer, KeyM
   }
 
   function Editor () {
-    this._state = new StateContainer(initialState)
-  }
-
-  Editor.prototype.dispatch = function (patch) {
-    this._state.dispatch(state => Object.freeze(Object.assign({}, state, patch)))
+    this._state = new StateContainer(initialState, Transformers.reducer)
   }
 
   Editor.prototype.showAst = function (ast) {
-    this.dispatch({ast: ast})
+    this._state.dispatch(Transformers.setAst(ast))
   }
 
   Editor.prototype.dispatchKeyEvent = function (e) {
     if (KeyMap.isPassthrough(e)) return false
 
     const action = KeyMap.getAction(e)
-    if (typeof action === 'function') {
-      action(this.getState(), patch => this.dispatch(patch))
+    if (action !== undefined) {
+      this._state.dispatch(action)
     } else {
       console.log('unbound key:', e.string)
     }

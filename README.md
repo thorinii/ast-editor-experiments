@@ -28,9 +28,7 @@ There is no usage yet.
 ## TODO
 
 * Immutable state & dispatch/reducer system
-  * Use reducers
-  * Use selectors to patch up 'null' states etc
-  * Split into KeyMap, CursorHandling, and DefaultKeyMapConfig
+  * Split into KeyMap and DefaultKeyMapConfig, Transformers, Cursor, and AstOps
 * Asynchronous compilation
   * Compile and test the code
     * Render the result in an output pane
