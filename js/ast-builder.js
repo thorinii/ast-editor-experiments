@@ -2,11 +2,11 @@ define([], function () {
   return {
     ap: function (fn, ...args) {
       return args.reduce((acc, a) => {
-        return {
+        return Object.freeze({
           type: 'apply',
           fn: acc,
           arg: typeof a === 'string' ? this.v(a) : a
-        }
+        })
       }, typeof fn === 'string' ? this.v(fn) : fn)
     },
 
@@ -14,24 +14,24 @@ define([], function () {
       let args = stuff.slice(0, stuff.length - 1)
       let value = stuff[stuff.length - 1]
       return args.reduceRight((acc, a) => {
-        return {
+        return Object.freeze({
           type: 'lambda',
           arg: a,
           value: acc
-        }
+        })
       }, typeof value === 'string' ? this.v(value) : value)
     },
 
     bin: function (op, ...args) {
-      return {type: 'binary', op: op, args: args.map(a => typeof a === 'string' ? this.v(a) : a)}
+      return Object.freeze({type: 'binary', op: op, args: args.map(a => typeof a === 'string' ? this.v(a) : a)})
     },
 
     v: function (id) {
-      return {type: 'variable', id: id}
+      return Object.freeze({type: 'variable', id: id})
     },
 
     l: function (value) {
-      return {type: 'literal', value: value}
+      return Object.freeze({type: 'literal', value: value})
     },
 
     lets: function (...stuff) {
@@ -56,15 +56,15 @@ define([], function () {
         caseValues.push([caseValuePairs[i], caseValuePairs[i + 1]])
       }
 
-      return {
+      return Object.freeze({
         type: 'pattern',
         arg: typeof arg === 'string' ? this.v(arg) : arg,
         cases: caseValues
-      }
+      })
     },
 
     any: function () {
-      return {type: 'any'}
+      return Object.freeze({type: 'any'})
     }
   }
 })

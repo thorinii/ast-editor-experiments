@@ -25,7 +25,7 @@ define(['react', 'ast-render-react', 'bootstrap-compiler', 'keymap-chart', 'ui-c
         }),
         e(UI.pane, {
           title: 'Instructions',
-          body: e('div', {}, 'Click on the code to activate key commands')
+          body: e('div', {}, 'Go and code things')
         }),
         e(KeyMapChart.render, {keyMap: props.keyMap}),
         e(UI.pane, {

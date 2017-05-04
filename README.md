@@ -28,9 +28,11 @@ There is no usage yet.
 ## TODO
 
 * Immutable state & dispatch/reducer system
-  * Use Object.freeze
   * Use dispatchers in KeyMap
-    * Split into KeyMap, CursorHandling, and DefaultKeyMapConfig
+  * Refactor JS file structure
+  * Use reducers
+  * Use selectors to patch up 'null' states etc
+  * Split into KeyMap, CursorHandling, and DefaultKeyMapConfig
 * Asynchronous compilation
   * Compile and test the code
     * Render the result in an output pane
@@ -47,6 +49,7 @@ There is no usage yet.
 * Fix editor pane layout/wrapping etc. Either fix the flexbox or use something else.
 * Better one-line rendering support (use complexity or approximate length)
 * Keyboard command binding (use proper key-binding system)
+* Attach comments to any node
 * Database/serialisation
   * A NodeJS server
   * Move to WebPack
@@ -54,6 +57,7 @@ There is no usage yet.
 * Use AST functions to execute commands
   * An abstract Editor Hooks function
 * Mouse
+* Use a consistent colour scheme
 
 
 ## Thoughts

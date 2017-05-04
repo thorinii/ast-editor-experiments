@@ -1,20 +1,21 @@
 define(['react', 'react-dom', 'editor-render', 'keymap'], function (React, ReactDOM, EditorRender, KeyMap) {
   'use strict'
 
+  const initialState = Object.freeze({
+    status: 'Idle',
+    ast: {type: 'hole'},
+    cursor: null
+  })
+
   function Editor (el) {
     this._el = el
+    this._state = initialState
 
-    this._state = {
-      status: 'Idle',
-      ast: {type: 'hole'},
-      cursor: ['value', 'value', 0, 'value', 'value', 'value', 0, 'value', 'fn']
-    }
-
-    this._render(el, this._state)
+    this._scheduleRender()
   }
 
   Editor.prototype.showAst = function (ast) {
-    this._state.ast = ast
+    this._state = Object.freeze(Object.assign({}, this._state, {ast: ast}))
     this._scheduleRender()
   }
 
@@ -29,19 +30,20 @@ define(['react', 'react-dom', 'editor-render', 'keymap'], function (React, React
     })
     ReactDOM.render(editorContainer, el)
 
-    const keyListener = e => {
+    const keyListener = ev => {
       try {
-        const key = translateKeyEvent(e)
+        const key = translateKeyEvent(ev)
         const prevent = this._processKeyboardEvent(key)
-        if (prevent) e.preventDefault()
+        if (prevent) ev.preventDefault()
       } catch (e) {
         console.error(e)
-        e.preventDefault()
+        ev.preventDefault()
       }
     }
-    if (!el.classList.contains('key-listener')) {
-      el.addEventListener('keypress', keyListener, false)
-      el.classList.add('key-listener')
+    const bodyEl = document.querySelector('body')
+    if (!bodyEl.classList.contains('key-listener')) {
+      bodyEl.addEventListener('keypress', keyListener, false)
+      bodyEl.classList.add('key-listener')
     }
   }
 
@@ -50,7 +52,7 @@ define(['react', 'react-dom', 'editor-render', 'keymap'], function (React, React
 
     const action = KeyMap.getAction(e)
     if (typeof action === 'function') {
-      action(this._state)
+      this._state = Object.freeze(action(this._state))
       this._scheduleRender()
     } else {
       console.log('unbound key:', e.string)
