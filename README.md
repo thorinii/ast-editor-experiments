@@ -28,7 +28,6 @@ There is no usage yet.
 ## TODO
 
 * Immutable state & dispatch/reducer system
-  * Use dispatchers in KeyMap
   * Refactor JS file structure
   * Use reducers
   * Use selectors to patch up 'null' states etc

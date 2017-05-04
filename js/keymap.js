@@ -52,13 +52,13 @@ define(['ast-operators'], function (AstOps) {
       key: '<space>',
       action: {
         description: 'Call the current expression as a function',
-        fn: state => Object.assign({}, state, {ast: {type: 'apply', fn: state.ast, arg: {type: 'hole'}}})
+        fn: (state, dispatch) => dispatch({ast: {type: 'apply', fn: state.ast, arg: {type: 'hole'}}})
       }
     }, {
       key: '.',
       action: {
         description: 'Call a function with the current expression',
-        fn: state => Object.assign({}, state, {ast: {type: 'apply', fn: {type: 'hole'}, arg: state.ast}})
+        fn: (state, dispatch) => dispatch({ast: {type: 'apply', fn: {type: 'hole'}, arg: state.ast}})
       }
     },
 
@@ -66,13 +66,13 @@ define(['ast-operators'], function (AstOps) {
       key: 'l',
       action: {
         description: 'Move to the next leaf node',
-        fn: state => Object.assign({}, state, {cursor: relativeLeaf(state.ast, state.cursor, 1)})
+        fn: (state, dispatch) => dispatch({cursor: relativeLeaf(state.ast, state.cursor, 1)})
       }
     }, {
       key: 'h',
       action: {
         description: 'Move to the previous leaf node',
-        fn: state => Object.assign({}, state, {cursor: relativeLeaf(state.ast, state.cursor, -1)})
+        fn: (state, dispatch) => dispatch({cursor: relativeLeaf(state.ast, state.cursor, -1)})
       }
     },
 
