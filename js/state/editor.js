@@ -1,4 +1,4 @@
-define(['state/keymap'], function (KeyMap) {
+define(['state/state-container', 'state/keymap'], function (StateContainer, KeyMap) {
   'use strict'
 
   const initialState = Object.freeze({
@@ -12,17 +12,11 @@ define(['state/keymap'], function (KeyMap) {
   }
 
   function Editor () {
-    this._state = {}
-    this._stateListener = function () {}
-
-    this.dispatch(initialState)
+    this._state = new StateContainer(initialState)
   }
 
   Editor.prototype.dispatch = function (patch) {
-    window.setTimeout(() => {
-      this._state = Object.freeze(Object.assign({}, this._state, patch))
-      this._stateListener(this._state)
-    })
+    this._state.dispatch(state => Object.freeze(Object.assign({}, state, patch)))
   }
 
   Editor.prototype.showAst = function (ast) {
@@ -34,7 +28,7 @@ define(['state/keymap'], function (KeyMap) {
 
     const action = KeyMap.getAction(e)
     if (typeof action === 'function') {
-      action(this._state, patch => this.dispatch(patch))
+      action(this.getState(), patch => this.dispatch(patch))
     } else {
       console.log('unbound key:', e.string)
     }
@@ -43,11 +37,11 @@ define(['state/keymap'], function (KeyMap) {
   }
 
   Editor.prototype.setStateListener = function (listener) {
-    this._stateListener = listener
+    this._state.setListener(listener)
   }
 
   Editor.prototype.getState = function () {
-    return this._state
+    return this._state.get()
   }
 
   Editor.prototype.getKeyMap = function () {
