@@ -1,4 +1,4 @@
-define(['keymap', 'react', 'ui-components'], function (KeyMap, React, UI) {
+define(['state/keymap', 'react', 'ui/ui-components'], function (KeyMap, React, UI) {
   const e = React.createElement
 
   return {

@@ -1,4 +1,4 @@
-define(['ast-operators'], function (AstOps) {
+define(['ast/ast-operators'], function (AstOps) {
   'use strict'
 
   function relativeLeaf (ast, cursor, offset) {

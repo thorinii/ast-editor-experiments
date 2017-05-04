@@ -28,7 +28,6 @@ There is no usage yet.
 ## TODO
 
 * Immutable state & dispatch/reducer system
-  * Refactor JS file structure
   * Use reducers
   * Use selectors to patch up 'null' states etc
   * Split into KeyMap, CursorHandling, and DefaultKeyMapConfig

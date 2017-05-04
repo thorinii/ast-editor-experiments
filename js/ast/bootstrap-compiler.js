@@ -1,4 +1,4 @@
-define(['ast-operators'], function (AstOps) {
+define(['ast/ast-operators'], function (AstOps) {
   return {
     translate: function (ast) {
       ast = AstOps.scrollLets(AstOps.sugarifyLet(ast))

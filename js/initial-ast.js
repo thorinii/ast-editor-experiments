@@ -97,7 +97,7 @@ function _$throw (e) {
   throw e
 }
 
-define(['ast-builder'], function (A) {
+define(['ast/ast-builder'], function (A) {
   'use strict'
 
   const arrayOf = (...items) => items.reduce((acc, el) => A.ap('Array$push', acc, el), A.l([]))

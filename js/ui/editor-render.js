@@ -1,4 +1,4 @@
-define(['react', 'ast-render-react', 'bootstrap-compiler', 'keymap-chart', 'ui-components'], function (React, AstRenderReact, Bootstrap, KeyMapChart, UI) {
+define(['react', 'ui/ast-render-react', 'ast/bootstrap-compiler', 'ui/keymap-chart', 'ui/ui-components'], function (React, AstRenderReact, Bootstrap, KeyMapChart, UI) {
   const e = React.createElement
   const tryFn = (fn, error) => { try { return fn() } catch (e) { return error(e) } }
 
