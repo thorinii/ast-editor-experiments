@@ -1,61 +1,38 @@
-define(['state/transformers'], function (Transformers) {
+define([], function () {
   'use strict'
 
-  const bindings = [
-    {
-      key: '<space>',
-      action: {
-        description: 'Call the current expression as a function',
-        action: Transformers.ast(Transformers.applySelected)
-      }
-    }, {
-      key: '.',
-      action: {
-        description: 'Call a function with the current expression',
-        action: Transformers.ast(Transformers.applyWithSelected)
-      }
-    },
-
-    {
-      key: 'l',
-      action: {
-        description: 'Move to the next leaf node',
-        action: Transformers.cursorMotion(1)
-      }
-    }, {
-      key: 'h',
-      action: {
-        description: 'Move to the previous leaf node',
-        action: Transformers.cursorMotion(-1)
-      }
-    },
-
-    { key: '<right>', ref: 'l' },
-    { key: '<left>', ref: 'h' }
+  const passthrough = [
+    'ctrl + r', 'ctrl + shift + r',
+    'f5', 'ctrl + f5',
+    'ctrl + shift + i',
+    'f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'f10', 'f11', 'f12'
   ]
 
-  const actions = bindings.reduce((acc, binding) => {
-    acc[binding.key] = binding.action ? binding.action.action : binding.ref
-    return acc
-  }, {})
+  const isPassthrough = function (e) { return passthrough.indexOf(e.string) !== -1 }
 
-  return {
-    isPassthrough: function (e) { return this.passthrough.indexOf(e.string) !== -1 },
-    getAction: function (e) {
-      if (typeof e === 'string') {
-        const action = this.actions[e]
-        return (typeof action === 'string') ? this.getAction(action) : action
-      } else {
-        return this.getAction(e.string)
-      }
-    },
-
-    passthrough: [
-      'ctrl + r', 'ctrl + shift + r',
-      'f5', 'ctrl + f5'
-    ],
-
-    bindings: bindings,
-    actions: actions
+  function KeyMap () {
+    this._bindings = []
+    this._actions = {}
   }
+
+  KeyMap.prototype.addBindings = function (bindings) {
+    bindings.forEach(b => this.addBinding(b))
+  }
+
+  KeyMap.prototype.addBinding = function (binding) {
+    this._bindings.push(binding)
+    this._actions[binding.key] = binding.action ? binding.action.action : binding.ref
+  }
+
+  KeyMap.prototype.isPassthrough = isPassthrough
+
+  KeyMap.prototype.getAction = function (key) {
+    const action = this._actions[key]
+    return (typeof action === 'string') ? this.getAction(action) : action
+  }
+
+  KeyMap.prototype.getBindings = function () { return this._bindings }
+  KeyMap.prototype.getActions = function () { return this._actions }
+
+  return KeyMap
 })

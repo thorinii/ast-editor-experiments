@@ -1,4 +1,4 @@
-define(['state/state-container', 'state/transformers', 'state/keymap'], function (StateContainer, Transformers, KeyMap) {
+define(['state/state-container', 'state/transformers', 'state/keymap', 'state/default-keymap-config'], function (StateContainer, Transformers, KeyMap, DefaultKeyMapConfig) {
   'use strict'
 
   const initialState = Object.freeze({
@@ -13,6 +13,9 @@ define(['state/state-container', 'state/transformers', 'state/keymap'], function
 
   function Editor () {
     this._state = new StateContainer(initialState, Transformers.reducer)
+    this._keyMap = new KeyMap()
+
+    this._keyMap.addBindings(DefaultKeyMapConfig.bindings)
   }
 
   Editor.prototype.showAst = function (ast) {
@@ -20,9 +23,9 @@ define(['state/state-container', 'state/transformers', 'state/keymap'], function
   }
 
   Editor.prototype.dispatchKeyEvent = function (e) {
-    if (KeyMap.isPassthrough(e)) return false
+    if (this._keyMap.isPassthrough(e)) return false
 
-    const action = KeyMap.getAction(e)
+    const action = this._keyMap.getAction(e.string)
     if (action !== undefined) {
       this._state.dispatch(action)
     } else {
@@ -36,13 +39,8 @@ define(['state/state-container', 'state/transformers', 'state/keymap'], function
     this._state.setListener(listener)
   }
 
-  Editor.prototype.getState = function () {
-    return this._state.get()
-  }
-
-  Editor.prototype.getKeyMap = function () {
-    return KeyMap
-  }
+  Editor.prototype.getState = function () { return this._state.get() }
+  Editor.prototype.getKeyMap = function () { return this._keyMap }
 
   return Editor
 })

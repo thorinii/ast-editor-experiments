@@ -5,7 +5,7 @@ define(['state/keymap', 'react', 'ui/ui-components'], function (KeyMap, React, U
     render: function (props) {
       const keyMap = props.keyMap
 
-      const bindings = keyMap.bindings.map(binding => {
+      const bindings = keyMap.getBindings().map(binding => {
         if (binding.action) {
           return e('li', {className: 'binding'},
             e('key', {}, binding.key),
