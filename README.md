@@ -27,14 +27,13 @@ There is no usage yet.
 
 ## TODO
 
-* Immutable state & dispatch/reducer system
-  * Transformers, Cursor, AstOps
 * Asynchronous compilation
   * Compile and test the code
     * Render the result in an output pane
   * Status message is derived from the queue
 * Implement more commands
   * All expression types
+  * Put all expression building in an Ast constructs module
 * More rolling up of nested things (in the core AST as well)
   * Lambda
   * Apply

@@ -1,4 +1,4 @@
-define(['ast/ast-operators'], function (AstOps) {
+define(['ast/ast-operators', 'state/cursor'], function (AstOps, Cursor) {
   'use strict'
 
   const T_SET_AST = 'set-ast'
@@ -11,10 +11,10 @@ define(['ast/ast-operators'], function (AstOps) {
   const astReducer = (ast, action) => {
     switch (action.type) {
       case AST_APPLY_SELECTED:
-        return Object.freeze({ type: 'apply', fn: ast, arg: {type: 'hole'} })
+        return AstOps.wrapApplyFn(ast)
 
       case AST_APPLY_WITH_SELECTED:
-        return Object.freeze({ type: 'apply', fn: {type: 'hole'}, arg: ast })
+        return AstOps.wrapApplyTo(ast)
 
       default:
         throw new TypeError('Unknown AST action: ' + action.type)
@@ -33,7 +33,7 @@ define(['ast/ast-operators'], function (AstOps) {
 
       case T_CURSOR_MOTION:
         return Object.freeze(Object.assign({}, state,
-          { cursor: AstOps.relativeLeaf(state.ast, state.cursor, action.direction) }))
+          { cursor: Cursor.moveToAdjacentLeaf(state.ast, state.cursor, action.direction) }))
 
       default:
         throw new TypeError('Unknown action: ' + action.type)
