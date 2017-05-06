@@ -2,7 +2,8 @@ define([
   'core/state-container', 'core/transformers',
   'core/keymap',
   'core/job-queue', 'core/job-executor',
-  'core/default-keymap-config'], function (StateContainer, Transformers, KeyMap, JobQueue, JobExecutor, DefaultKeyMapConfig) {
+  'core/task-compile',
+  'core/default-keymap-config'], function (StateContainer, Transformers, KeyMap, JobQueue, JobExecutor, CompileTask, DefaultKeyMapConfig) {
   'use strict'
 
   const EVENT_IMPORT_AST = 'import-ast'
@@ -35,6 +36,8 @@ define([
       (target, key, value) => { this._dispatchEvent({ type: EVENT_UPDATE_CACHE, target, key, value }) }
     )
     this._listener = null
+
+    CompileTask(this._jobExecutor)
 
     this._keyMap.addBindings(DefaultKeyMapConfig.bindings)
   }

@@ -1,10 +1,16 @@
-define(['core/job-queue', 'ast/bootstrap-compiler'], function (Queue, Bootstrap) {
+define(['core/job-queue'], function (Queue) {
   function JobExecutor (callback, updateCache) {
     this._callback = callback
     this._updateCache = updateCache
     this._counter = 0
 
+    this._tasks = {}
+
     this._finishedList = []
+  }
+
+  JobExecutor.prototype.registerTask = function (name, fn) {
+    this._tasks[name] = fn
   }
 
   JobExecutor.prototype.process = function (state, queue) {
@@ -37,9 +43,10 @@ define(['core/job-queue', 'ast/bootstrap-compiler'], function (Queue, Bootstrap)
     }
 
     const input = state[job.params.source][job.params.source_key]
+    const fn = this._tasks[job.type]
 
     setTimeout(() => {
-      compilerTask(input, onFinished)
+      fn(input, onFinished)
     })
 
     return Queue.start(queue, job, id)
@@ -57,16 +64,6 @@ define(['core/job-queue', 'ast/bootstrap-compiler'], function (Queue, Bootstrap)
 
     this._finishedList = []
     return nextQueue
-  }
-
-  const compilerTask = (input, callback) => {
-    try {
-      const result = Bootstrap.translate(input)
-      callback(result)
-    } catch (e) {
-      console.warn('Failed to compile', e)
-      callback(null)
-    }
   }
 
   return JobExecutor

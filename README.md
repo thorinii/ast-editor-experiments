@@ -32,7 +32,6 @@ There is no usage yet.
     * Dependency management
     * Consolidation
   * JobExecutor
-    * Register the task implementations
     * Can watch inputs (eg `state`, `cache`)
   * Compiler
     * Automatically add `compile` to the queue when the code changes
