@@ -1,9 +1,11 @@
-define(['ast/ast-operators', 'core/cursor'], function (AstOps, Cursor) {
+define(['ast/ast-operators', 'core/cursor', 'core/job-queue'], function (AstOps, Cursor, JobQueue) {
   'use strict'
 
   const T_IMPORT_AST = 'import-ast'
   const T_AST = 'ast'
   const T_CURSOR_MOTION = 'cursor-motion'
+  const T_ENQUEUE_JOB = 'enqueue-job'
+  const T_UPDATE_JOB_QUEUE = 'update-job-queue'
 
   const AST_APPLY_SELECTED = 'apply-selected'
   const AST_APPLY_WITH_SELECTED = 'apply-with-selected'
@@ -45,6 +47,13 @@ define(['ast/ast-operators', 'core/cursor'], function (AstOps, Cursor) {
           updateKey(state.cursor, 'path',
             Cursor.moveToAdjacentLeaf(state.code[state.cursor.name], state.cursor.path, action.direction)))
 
+      case T_ENQUEUE_JOB:
+        return updateKey(state, 'jobQueue',
+          JobQueue.enqueue(state.jobQueue, action.job))
+
+      case T_UPDATE_JOB_QUEUE:
+        return updateKey(state, 'jobQueue', action.queue)
+
       default:
         throw new TypeError('Unknown action: ' + action.type)
     }
@@ -64,6 +73,14 @@ define(['ast/ast-operators', 'core/cursor'], function (AstOps, Cursor) {
 
     cursorMotion: direction => {
       return { type: T_CURSOR_MOTION, direction: direction }
+    },
+
+    enqueueJob: job => {
+      return { type: T_ENQUEUE_JOB, job: job }
+    },
+
+    updateJobQueue: queue => {
+      return { type: T_UPDATE_JOB_QUEUE, queue: queue }
     },
 
     /* AST actions */

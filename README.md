@@ -28,10 +28,16 @@ There is no usage yet.
 ## TODO
 
 * Asynchronous compilation and testing
+  * JobQueue
+    * Contains JSON job data; stored in the `state` object
+    * Does dependency management, blocking, etc
+    * submitJob()
+    * cancelJob ?
+  * JobExecutor
+    * Runs the stuff in the JobQueue; stored in the editor
+    * Register the task implementations
+    * Can watch inputs (eg `state`, `cache`)
   * Compiler
-    * Add `state.jobQueue`
-      * A class that does execution, dependency management etc
-      * A Job is a descriptor (just JSON) that gets turned into a Task (with a fn)
     * Add `compile` to the queue
       * Compile to `state.cache['compiler-output']['main']`
       * The output insertion managed by the JobQueue (ie target='compiler-output', key='main')
