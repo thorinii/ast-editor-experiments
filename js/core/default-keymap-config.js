@@ -1,4 +1,4 @@
-define(['state/transformers'], function (Transformers) {
+define(['core/transformers'], function (Transformers) {
   'use strict'
 
   const bindings = [

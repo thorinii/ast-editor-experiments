@@ -1,4 +1,4 @@
-define(['ast/ast-operators', 'state/cursor'], function (AstOps, Cursor) {
+define(['ast/ast-operators', 'core/cursor'], function (AstOps, Cursor) {
   'use strict'
 
   const T_IMPORT_AST = 'import-ast'

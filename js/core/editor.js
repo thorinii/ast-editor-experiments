@@ -1,4 +1,7 @@
-define(['state/state-container', 'state/transformers', 'state/keymap', 'state/default-keymap-config'], function (StateContainer, Transformers, KeyMap, DefaultKeyMapConfig) {
+define([
+  'core/state-container', 'core/transformers',
+  'core/keymap',
+  'core/default-keymap-config'], function (StateContainer, Transformers, KeyMap, DefaultKeyMapConfig) {
   'use strict'
 
   const EVENT_IMPORT_AST = 'import-ast'
