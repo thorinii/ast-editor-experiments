@@ -27,10 +27,26 @@ There is no usage yet.
 
 ## TODO
 
-* Asynchronous compilation
-  * Compile and test the code
-    * Render the result in an output pane
-  * Status message is derived from the queue
+* Asynchronous compilation and testing
+  * Compiler
+    * Refactor to `state.code['main']`
+    * Add `state.jobQueue`
+      * A class that does execution, dependency management etc
+      * A Job is a descriptor (just JSON) that gets turned into a Task (with a fn)
+    * Add `compile` to the queue
+      * Compile to `state.cache['compiler-output']['main']`
+      * The output insertion managed by the JobQueue (ie target='compiler-output', key='main')
+    * Automatically add `compile` to the queue when the code changes
+    * Show compilation result in output pane
+    * Show status
+  * Test
+    * Automatically add `test` (with dependency on `compiler-output`) to the queue
+      * Does `compile` if out of date
+        * Waits for `compile` task if already in queue
+      * Unless fails
+    * `compile` and `test` can short-circuit if up to data
+      * Done by JobQueue
+    * Render test results in output pane
 * Implement more commands
   * All expression types
   * Put all expression building in an Ast constructs module

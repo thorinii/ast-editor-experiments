@@ -16,7 +16,7 @@ define(['react', 'ui/ast-render-react', 'ast/bootstrap-compiler', 'ui/keymap-cha
     editor: props => {
       const state = props.state
 
-      const pane = e('div', {className: 'pane'}, e(AstView, {ast: state.ast, cursor: state.cursor}))
+      const pane = e('div', {className: 'pane'}, e(AstView, {ast: state.code['main'], cursor: state.cursor.path}))
 
       const sidebar = e('div', {className: 'sidebar'},
         e(UI.pane, {
@@ -30,7 +30,7 @@ define(['react', 'ui/ast-render-react', 'ast/bootstrap-compiler', 'ui/keymap-cha
         e(KeyMapChart.render, {keyMap: props.keyMap}),
         e(UI.pane, {
           title: 'Compiled JS',
-          body: e(CompiledJsView, {ast: state.ast})
+          body: e(CompiledJsView, {ast: state.code['main']})
         }))
 
       return e('div', {},

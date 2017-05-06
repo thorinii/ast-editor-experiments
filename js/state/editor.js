@@ -3,8 +3,13 @@ define(['state/state-container', 'state/transformers', 'state/keymap', 'state/de
 
   const initialState = Object.freeze({
     status: 'Idle',
-    ast: {type: 'hole'},
-    cursor: null
+    code: {
+      'main': {type: 'hole'}
+    },
+    cursor: {
+      name: 'main',
+      path: null
+    }
   })
 
   function compile (js) {
@@ -19,7 +24,7 @@ define(['state/state-container', 'state/transformers', 'state/keymap', 'state/de
   }
 
   Editor.prototype.showAst = function (ast) {
-    this._state.dispatch(Transformers.setAst(ast))
+    this._state.dispatch(Transformers.importAst(ast))
   }
 
   Editor.prototype.dispatchKeyEvent = function (e) {

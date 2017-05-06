@@ -1,12 +1,20 @@
 define(['ast/ast-operators', 'state/cursor'], function (AstOps, Cursor) {
   'use strict'
 
-  const T_SET_AST = 'set-ast'
+  const T_IMPORT_AST = 'import-ast'
   const T_AST = 'ast'
   const T_CURSOR_MOTION = 'cursor-motion'
 
   const AST_APPLY_SELECTED = 'apply-selected'
   const AST_APPLY_WITH_SELECTED = 'apply-with-selected'
+
+  const update = (original, patch) =>
+    Object.freeze(Object.assign({}, original, patch))
+  const updateKey = (original, key, value) => {
+    const patch = {}
+    patch[key] = value
+    return update(original, patch)
+  }
 
   const astReducer = (ast, action) => {
     switch (action.type) {
@@ -23,17 +31,19 @@ define(['ast/ast-operators', 'state/cursor'], function (AstOps, Cursor) {
 
   const reducer = (state, action) => {
     switch (action.type) {
-      case T_SET_AST:
-        return Object.freeze(Object.assign({}, state,
-          { ast: action.ast }))
+      case T_IMPORT_AST:
+        return updateKey(state, 'code',
+          updateKey(state.code, action.name, action.ast))
 
       case T_AST:
-        return Object.freeze(Object.assign({}, state,
-          { ast: astReducer(state.ast, action.action) }))
+        return updateKey(state, 'code',
+          updateKey(state.code, action.name,
+            astReducer(state.code[action.name], action.action)))
 
       case T_CURSOR_MOTION:
-        return Object.freeze(Object.assign({}, state,
-          { cursor: Cursor.moveToAdjacentLeaf(state.ast, state.cursor, action.direction) }))
+        return updateKey(state, 'cursor',
+          updateKey(state.cursor, 'path',
+            Cursor.moveToAdjacentLeaf(state.code[state.cursor.name], state.cursor.path, action.direction)))
 
       default:
         throw new TypeError('Unknown action: ' + action.type)
@@ -44,12 +54,12 @@ define(['ast/ast-operators', 'state/cursor'], function (AstOps, Cursor) {
 
   return {
     /* Top-level actions */
-    setAst: ast => {
-      return { type: T_SET_AST, ast: ast }
+    importAst: ast => {
+      return { type: T_IMPORT_AST, name: 'main', ast: ast }
     },
 
     ast: action => {
-      return { type: T_AST, action: action }
+      return { type: T_AST, name: 'main', action: action }
     },
 
     cursorMotion: direction => {
