@@ -44,7 +44,7 @@ define(['react', 'react-dom', 'ui/editor-render'], function (React, ReactDOM, Ed
     this._editor = editor
     this._el = el
 
-    this._editor.setStateListener(() => this._render())
+    this._editor.setListener(() => this._render())
     this._render()
   }
 
@@ -62,9 +62,13 @@ define(['react', 'react-dom', 'ui/editor-render'], function (React, ReactDOM, Ed
 
     const keyListener = ev => {
       try {
-        const key = translateKeyEvent(ev)
-        const prevent = this._editor.dispatchKeyEvent(key)
-        if (prevent) ev.preventDefault()
+        const translatedEvent = translateKeyEvent(ev)
+        const key = translatedEvent.string
+
+        if (!this._editor.getKeyMap().isPassthrough(key)) {
+          this._editor.dispatchKey(key)
+          ev.preventDefault()
+        }
       } catch (e) {
         console.error(e)
         ev.preventDefault()

@@ -29,7 +29,6 @@ There is no usage yet.
 
 * Asynchronous compilation and testing
   * Compiler
-    * Refactor to `state.code['main']`
     * Add `state.jobQueue`
       * A class that does execution, dependency management etc
       * A Job is a descriptor (just JSON) that gets turned into a Task (with a fn)

@@ -1,6 +1,9 @@
 define(['state/state-container', 'state/transformers', 'state/keymap', 'state/default-keymap-config'], function (StateContainer, Transformers, KeyMap, DefaultKeyMapConfig) {
   'use strict'
 
+  const EVENT_IMPORT_AST = 'import-ast'
+  const EVENT_KEY = 'key'
+
   const initialState = Object.freeze({
     status: 'Idle',
     code: {
@@ -19,29 +22,55 @@ define(['state/state-container', 'state/transformers', 'state/keymap', 'state/de
   function Editor () {
     this._state = new StateContainer(initialState, Transformers.reducer)
     this._keyMap = new KeyMap()
+    this._listener = null
 
     this._keyMap.addBindings(DefaultKeyMapConfig.bindings)
   }
 
   Editor.prototype.showAst = function (ast) {
-    this._state.dispatch(Transformers.importAst(ast))
+    this._dispatchEvent({ type: EVENT_IMPORT_AST, ast: ast })
   }
 
-  Editor.prototype.dispatchKeyEvent = function (e) {
-    if (this._keyMap.isPassthrough(e)) return false
+  Editor.prototype.dispatchKey = function (key) {
+    this._dispatchEvent({ type: EVENT_KEY, key: key })
+  }
 
-    const action = this._keyMap.getAction(e.string)
-    if (action !== undefined) {
-      this._state.dispatch(action)
-    } else {
-      console.log('unbound key:', e.string)
+  Editor.prototype._dispatchEvent = function (ev) {
+    this._processEvent(ev)
+
+    // TODO: process job watchers
+    // TODO: process job queue
+
+    this._listener()
+  }
+
+  Editor.prototype._processEvent = function (ev) {
+    switch (ev.type) {
+      case EVENT_IMPORT_AST: {
+        this._state.apply(Transformers.importAst(ev.ast))
+        break
+      }
+
+      case EVENT_KEY: {
+        const action = this._keyMap.getAction(ev.key)
+        if (action !== undefined) {
+          this._state.apply(action)
+        } else {
+          console.log('unbound key:', ev.key)
+        }
+        break
+      }
+
+      default: {
+        console.warn('Unknown event', ev.type, ev)
+        break
+      }
     }
-
-    return true
   }
 
-  Editor.prototype.setStateListener = function (listener) {
-    this._state.setListener(listener)
+  Editor.prototype.setListener = function (listener) {
+    if (this._listener !== null) throw new Error('Can only set one listener on the Editor')
+    this._listener = listener
   }
 
   Editor.prototype.getState = function () { return this._state.get() }

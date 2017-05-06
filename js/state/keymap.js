@@ -8,7 +8,7 @@ define([], function () {
     'f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'f10', 'f11', 'f12'
   ]
 
-  const isPassthrough = function (e) { return passthrough.indexOf(e.string) !== -1 }
+  const isPassthrough = function (key) { return passthrough.indexOf(key) !== -1 }
 
   function KeyMap () {
     this._bindings = []
