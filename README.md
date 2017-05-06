@@ -29,21 +29,14 @@ There is no usage yet.
 
 * Asynchronous compilation and testing
   * JobQueue
-    * Contains JSON job data; stored in the `state` object
-    * Does dependency management, blocking, etc
-    * submitJob()
-    * cancelJob ?
+    * Dependency management
+    * Consolidation
   * JobExecutor
-    * Runs the stuff in the JobQueue; stored in the editor
     * Register the task implementations
     * Can watch inputs (eg `state`, `cache`)
   * Compiler
-    * Add `compile` to the queue
-      * Compile to `state.cache['compiler-output']['main']`
-      * The output insertion managed by the JobQueue (ie target='compiler-output', key='main')
     * Automatically add `compile` to the queue when the code changes
-    * Show compilation result in output pane
-    * Show status
+    * Show compiling status
   * Test
     * Automatically add `test` (with dependency on `compiler-output`) to the queue
       * Does `compile` if out of date
@@ -52,6 +45,7 @@ There is no usage yet.
     * `compile` and `test` can short-circuit if up to data
       * Done by JobQueue
     * Render test results in output pane
+    * Show testing status & success/failure
 * Implement more commands
   * All expression types
   * Put all expression building in an Ast constructs module

@@ -8,6 +8,7 @@ define([
   const EVENT_IMPORT_AST = 'import-ast'
   const EVENT_KEY = 'key'
   const EVENT_JOB_UPDATE = 'job-update'
+  const EVENT_UPDATE_CACHE = 'update-cache'
 
   const initialState = Object.freeze({
     status: 'Idle',
@@ -18,7 +19,8 @@ define([
       name: 'main',
       path: null
     },
-    jobQueue: JobQueue.createQueue()
+    jobQueue: JobQueue.createQueue(),
+    cache: {}
   })
 
   function compile (js) {
@@ -28,7 +30,10 @@ define([
   function Editor () {
     this._state = new StateContainer(initialState, Transformers.reducer)
     this._keyMap = new KeyMap()
-    this._jobExecutor = new JobExecutor(() => { this._dispatchEvent({ type: EVENT_JOB_UPDATE }) })
+    this._jobExecutor = new JobExecutor(
+      () => { this._dispatchEvent({ type: EVENT_JOB_UPDATE }) },
+      (target, key, value) => { this._dispatchEvent({ type: EVENT_UPDATE_CACHE, target, key, value }) }
+    )
     this._listener = null
 
     this._keyMap.addBindings(DefaultKeyMapConfig.bindings)
@@ -49,12 +54,14 @@ define([
   }
 
   Editor.prototype._dispatchEvent = function (ev) {
-    this._processEvent(ev)
+    setTimeout(() => {
+      this._processEvent(ev)
 
-    // TODO: process job watchers
-    this._processJobQueue()
+      // TODO: process job watchers
+      this._processJobQueue()
 
-    this._listener()
+      this._listener()
+    })
   }
 
   Editor.prototype._processEvent = function (ev) {
@@ -77,7 +84,7 @@ define([
           {
             source: 'code',
             source_key: 'main',
-            target: 'cache.compiler-output',
+            target: 'compiled',
             target_key: 'main'
           })))
         break
@@ -85,6 +92,11 @@ define([
 
       case EVENT_JOB_UPDATE: {
         // no-op to get the JobExecutor to reprocess
+        break
+      }
+
+      case EVENT_UPDATE_CACHE: {
+        this._state.apply(Transformers.updateCache(ev.target, ev.key, ev.value))
         break
       }
 
@@ -96,8 +108,9 @@ define([
   }
 
   Editor.prototype._processJobQueue = function () {
-    const queue = this.getState().jobQueue
-    const nextQueue = this._jobExecutor.process(queue)
+    const state = this.getState()
+    const queue = state.jobQueue
+    const nextQueue = this._jobExecutor.process(state, queue)
     this._state.apply(Transformers.updateJobQueue(nextQueue))
   }
 

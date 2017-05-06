@@ -6,6 +6,7 @@ define(['ast/ast-operators', 'core/cursor', 'core/job-queue'], function (AstOps,
   const T_CURSOR_MOTION = 'cursor-motion'
   const T_ENQUEUE_JOB = 'enqueue-job'
   const T_UPDATE_JOB_QUEUE = 'update-job-queue'
+  const T_UPDATE_CACHE = 'update-cache'
 
   const AST_APPLY_SELECTED = 'apply-selected'
   const AST_APPLY_WITH_SELECTED = 'apply-with-selected'
@@ -54,6 +55,12 @@ define(['ast/ast-operators', 'core/cursor', 'core/job-queue'], function (AstOps,
       case T_UPDATE_JOB_QUEUE:
         return updateKey(state, 'jobQueue', action.queue)
 
+      case T_UPDATE_CACHE: {
+        return updateKey(state, 'cache',
+          updateKey(state.cache, action.target,
+            updateKey(state.cache[action.target], action.key, action.value)))
+      }
+
       default:
         throw new TypeError('Unknown action: ' + action.type)
     }
@@ -81,6 +88,10 @@ define(['ast/ast-operators', 'core/cursor', 'core/job-queue'], function (AstOps,
 
     updateJobQueue: queue => {
       return { type: T_UPDATE_JOB_QUEUE, queue: queue }
+    },
+
+    updateCache: (target, key, value) => {
+      return { type: T_UPDATE_CACHE, target, key, value }
     },
 
     /* AST actions */

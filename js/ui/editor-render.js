@@ -10,7 +10,7 @@ define(['react', 'ui/ast-render-react', 'ast/bootstrap-compiler', 'ui/keymap-cha
   const CompiledJsView = props => e(
     'div',
     {className: 'code-text'},
-    tryFn(() => Bootstrap.translate(props.ast), e => '' + e))
+    props.compiled['main'] || 'not compiled')
 
   return {
     editor: props => {
@@ -30,7 +30,7 @@ define(['react', 'ui/ast-render-react', 'ast/bootstrap-compiler', 'ui/keymap-cha
         e(KeyMapChart.render, {keyMap: props.keyMap}),
         e(UI.pane, {
           title: 'Compiled JS',
-          body: e(CompiledJsView, {ast: state.code['main']})
+          body: e(CompiledJsView, {compiled: state.cache['compiled'] || {}})
         }))
 
       return e('div', {},

@@ -17,16 +17,15 @@ define([], function () {
   }
 
   const dequeue = queue => {
+    if (Object.keys(queue.running).length > 0) return { nextQueue: queue, job: null }
+    if (queue.queued.length === 0) return { nextQueue: queue, job: null }
+
     const job = queue.queued[0]
-    if (job === undefined) {
-      return { nextQueue: queue, job: null }
-    } else {
-      return {
-        nextQueue: Object.assign({}, queue, {
-          queued: queue.queued.slice(1)
-        }),
-        job: job
-      }
+    return {
+      nextQueue: Object.assign({}, queue, {
+        queued: queue.queued.slice(1)
+      }),
+      job: job
     }
   }
 

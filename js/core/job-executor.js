@@ -1,16 +1,17 @@
-define(['core/job-queue'], function (Queue) {
-  function JobExecutor (callback) {
+define(['core/job-queue', 'ast/bootstrap-compiler'], function (Queue, Bootstrap) {
+  function JobExecutor (callback, updateCache) {
     this._callback = callback
+    this._updateCache = updateCache
     this._counter = 0
 
     this._finishedList = []
   }
 
-  JobExecutor.prototype.process = function (queue) {
-    return this._startJobs(this._finishJobs(queue))
+  JobExecutor.prototype.process = function (state, queue) {
+    return this._startJobs(state, this._finishJobs(queue))
   }
 
-  JobExecutor.prototype._startJobs = function (queue) {
+  JobExecutor.prototype._startJobs = function (state, queue) {
     let nextQueue = queue
     let job
 
@@ -20,14 +21,14 @@ define(['core/job-queue'], function (Queue) {
       job = r.job
 
       if (job !== null) {
-        nextQueue = this._startJob(nextQueue, job)
+        nextQueue = this._startJob(state, nextQueue, job)
       }
     } while (job !== null)
 
     return nextQueue
   }
 
-  JobExecutor.prototype._startJob = function (queue, job) {
+  JobExecutor.prototype._startJob = function (state, queue, job) {
     const id = this._counter++
 
     const onFinished = result => {
@@ -35,10 +36,11 @@ define(['core/job-queue'], function (Queue) {
       this._callback()
     }
 
+    const input = state[job.params.source][job.params.source_key]
+
     setTimeout(() => {
-      const result = {}
-      onFinished(result)
-    }, 1000)
+      compilerTask(input, onFinished)
+    })
 
     return Queue.start(queue, job, id)
   }
@@ -48,14 +50,23 @@ define(['core/job-queue'], function (Queue) {
       const {id, result} = finished
       const {nextQueue, job} = Queue.finish(q, id)
 
-      job.params.target // TODO: store the result
-      result
+      this._updateCache(job.params.target, job.params.target_key, result)
 
       return nextQueue
     }, queue)
 
     this._finishedList = []
     return nextQueue
+  }
+
+  const compilerTask = (input, callback) => {
+    try {
+      const result = Bootstrap.translate(input)
+      callback(result)
+    } catch (e) {
+      console.warn('Failed to compile', e)
+      callback(null)
+    }
   }
 
   return JobExecutor
