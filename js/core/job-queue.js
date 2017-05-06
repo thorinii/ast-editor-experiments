@@ -10,7 +10,19 @@ define([], function () {
     return { type: type, params: params }
   }
 
+  const isIdle = queue => Object.keys(queue.running).length === 0
+  const isEmpty = queue => queue.queued.length === 0
+
+  const isSameJob = (a, b) => {
+    const same = (a, b) => JSON.stringify(a) === JSON.stringify(b)
+    return same(Object.keys(a.params).sort(), Object.keys(b.params).sort()) &&
+           same(Object.keys(a.params).sort().map(key => a[key]), Object.keys(b.params).sort().map(key => b[key]))
+  }
   const enqueue = (queue, job) => {
+    if (queue.queued.find(j => {
+      return isSameJob(j, job)
+    })) return queue
+
     return Object.assign({}, queue, {
       queued: queue.queued.concat([job])
     })
@@ -54,6 +66,9 @@ define([], function () {
   return {
     createQueue: createQueue,
     createJob: createJob,
+
+    isIdle,
+    isEmpty,
 
     enqueue: enqueue,
     dequeue: dequeue,

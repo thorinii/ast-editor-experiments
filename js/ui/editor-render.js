@@ -7,10 +7,18 @@ define(['react', 'ui/ast-render-react', 'ast/bootstrap-compiler', 'ui/keymap-cha
     {className: 'code-text', tabIndex: 0},
     tryFn(() => AstRenderReact.render(props.cursor, props.ast), e => ['' + e]))
 
-  const CompiledJsView = props => e(
-    'div',
-    {className: 'code-text'},
-    props.compiled['main'] || 'not compiled')
+  const CompiledJsView = props => {
+    const result = props.compiled['main']
+    let render
+    if (!result) {
+      render = 'not compiled'
+    } else if (!result.success) {
+      render = 'failed to compile'
+    } else {
+      render = result.output
+    }
+    return e('div', {className: 'code-text'}, render)
+  }
 
   return {
     editor: props => {

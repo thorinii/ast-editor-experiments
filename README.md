@@ -28,14 +28,10 @@ There is no usage yet.
 ## TODO
 
 * Asynchronous compilation and testing
+  * Compiler
+    * Show compiling status & success/failure
   * JobQueue
     * Dependency management
-    * Consolidation
-  * JobExecutor
-    * Can watch inputs (eg `state`, `cache`)
-  * Compiler
-    * Automatically add `compile` to the queue when the code changes
-    * Show compiling status
   * Test
     * Automatically add `test` (with dependency on `compiler-output`) to the queue
       * Does `compile` if out of date

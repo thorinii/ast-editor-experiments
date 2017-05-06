@@ -60,7 +60,7 @@ define([
     setTimeout(() => {
       this._processEvent(ev)
 
-      // TODO: process job watchers
+      this._processJobWatchers()
       this._processJobQueue()
 
       this._listener()
@@ -81,15 +81,6 @@ define([
         } else {
           console.log('unbound key:', ev.key)
         }
-
-        this._state.apply(Transformers.enqueueJob(JobQueue.createJob(
-          'compile',
-          {
-            source: 'code',
-            source_key: 'main',
-            target: 'compiled',
-            target_key: 'main'
-          })))
         break
       }
 
@@ -108,6 +99,13 @@ define([
         break
       }
     }
+  }
+
+  Editor.prototype._processJobWatchers = function () {
+    const state = this.getState()
+    const queue = state.jobQueue
+    const nextQueue = this._jobExecutor.processWatchers(state, queue)
+    this._state.apply(Transformers.updateJobQueue(nextQueue))
   }
 
   Editor.prototype._processJobQueue = function () {

@@ -5,12 +5,23 @@ define(['core/job-queue'], function (Queue) {
     this._counter = 0
 
     this._tasks = {}
+    this._watchers = []
 
     this._finishedList = []
   }
 
   JobExecutor.prototype.registerTask = function (name, fn) {
     this._tasks[name] = fn
+  }
+  JobExecutor.prototype.registerWatcher = function (fn) {
+    this._watchers.push(fn)
+  }
+
+  JobExecutor.prototype.processWatchers = function (state, queue) {
+    return this._watchers.reduce((q, watcher) => {
+      const tasks = watcher(state)
+      return tasks.reduce((q, task) => Queue.enqueue(q, task), q)
+    }, queue)
   }
 
   JobExecutor.prototype.process = function (state, queue) {
