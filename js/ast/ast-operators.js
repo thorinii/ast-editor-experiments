@@ -60,8 +60,7 @@ define(['ast/ast-builder'], function (A) {
           }
 
         default:
-          console.warn('UNKNOWN AST node', ast.type, ast)
-          return A.l('UNKNOWN')
+          throw new TypeError('Unknown AST node: ' + ast.type)
       }
     }
   }

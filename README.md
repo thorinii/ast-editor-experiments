@@ -28,8 +28,6 @@ There is no usage yet.
 ## TODO
 
 * Asynchronous compilation and testing
-  * Compiler
-    * Show compiling status & success/failure
   * JobQueue
     * Dependency management
   * Test
@@ -52,6 +50,10 @@ There is no usage yet.
   * A NodeJS server
   * Move to WebPack
   * Use LevelDB (https://github.com/Level/level) with encoding=json
+  * https://webpack.js.org/guides/get-started/
+  * https://webpack.js.org/guides/development/#webpack-dev-middleware
+  * http://www.pauleveritt.org/articles/pylyglot/webpack/
+  * http://jamesknelson.com/using-es6-in-the-browser-with-babel-6-and-webpack/
 * Implement more cursor motions
   * Hole navigation (<tab>)
   * Widening/shrinking
@@ -74,6 +76,8 @@ There is no usage yet.
     * Input + expected output for each row
 * Add types
 * 2D spatial code grid
+* Mobile interface
+  * So offload as much work as possible to server
 
 
 ## Thoughts

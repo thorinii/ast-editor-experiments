@@ -63,17 +63,27 @@ define([], function () {
     }
   }
 
+  const running = queue => {
+    return Object.keys(queue.running).map(key => queue.running[key])
+  }
+  const queued = queue => {
+    return queue.queued
+  }
+
   return {
-    createQueue: createQueue,
-    createJob: createJob,
+    createQueue,
+    createJob,
 
     isIdle,
     isEmpty,
 
-    enqueue: enqueue,
-    dequeue: dequeue,
+    enqueue,
+    dequeue,
 
-    start: start,
-    finish: finish
+    start,
+    finish,
+
+    running,
+    queued
   }
 })

@@ -12,7 +12,6 @@ define([
   const EVENT_UPDATE_CACHE = 'update-cache'
 
   const initialState = Object.freeze({
-    status: 'Idle',
     code: {
       'main': {type: 'hole'}
     },

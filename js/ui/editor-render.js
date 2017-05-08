@@ -1,6 +1,12 @@
-define(['react', 'ui/ast-render-react', 'ast/bootstrap-compiler', 'ui/keymap-chart', 'ui/ui-components'], function (React, AstRenderReact, Bootstrap, KeyMapChart, UI) {
+define(['react', 'ui/ast-render-react', 'ui/keymap-chart', 'ui/ui-components', 'core/selectors'], function (React, AstRenderReact, KeyMapChart, UI, Selectors) {
   const e = React.createElement
   const tryFn = (fn, error) => { try { return fn() } catch (e) { return error(e) } }
+  const intersperse = (arr, sep) => arr.reduce((a, v) => [...a, v, sep], []).slice(0, -1)
+
+  const StatusView = props => e(
+    'div',
+    {className: 'message ' + props.level},
+    intersperse(props.message.split('\n'), e('br')))
 
   const AstView = props => e(
     'div',
@@ -29,7 +35,7 @@ define(['react', 'ui/ast-render-react', 'ast/bootstrap-compiler', 'ui/keymap-cha
       const sidebar = e('div', {className: 'sidebar'},
         e(UI.pane, {
           type: 'status pane-noseparator',
-          body: e('div', {className: 'message info'}, state.status)
+          body: e(StatusView, Selectors.status(state))
         }),
         e(UI.pane, {
           title: 'Instructions',
