@@ -18,6 +18,7 @@ See this project live at https://thorinii.github.io/ast-editor-experiments/.
   * Toplevel declarations don't have an order
 * Tests can be spatially located close to the code
   * Automatically run when things change
+* Possibly usable on a phone-sized/touch-based device
 
 
 ## Usage
@@ -31,12 +32,7 @@ There is no usage yet.
   * JobQueue
     * Dependency management
   * Test
-    * Automatically add `test` (with dependency on `compiler-output`) to the queue
-      * Does `compile` if out of date
-        * Waits for `compile` task if already in queue
-      * Unless fails
-    * `compile` and `test` can short-circuit if up to data
-      * Done by JobQueue
+    * Automatically test when compiler cache changes
     * Render test results in output pane
     * Show testing status & success/failure
 * Implement more commands
@@ -49,13 +45,14 @@ There is no usage yet.
 * Database/serialisation
   * A NodeJS server
   * Move to WebPack
+  * Rewrite in Purescript
   * Use LevelDB (https://github.com/Level/level) with encoding=json
   * https://webpack.js.org/guides/get-started/
   * https://webpack.js.org/guides/development/#webpack-dev-middleware
   * http://www.pauleveritt.org/articles/pylyglot/webpack/
   * http://jamesknelson.com/using-es6-in-the-browser-with-babel-6-and-webpack/
 * Implement more cursor motions
-  * Hole navigation (<tab>)
+  * Hole navigation (tab)
   * Widening/shrinking
 * Support multiple top-levels
 * Array/object literals
@@ -64,7 +61,6 @@ There is no usage yet.
 * Keyboard command binding (use proper key-binding system)
 * Attach comments to any node
 * Switch to a Purescript AST
-* Rewrite in Purescript
 * Use AST functions to execute commands
   * An abstract Editor Hooks function
 * Mouse

@@ -13,8 +13,27 @@ define(['core/job-queue'], function (Queue) {
   JobExecutor.prototype.registerTask = function (name, fn) {
     this._tasks[name] = fn
   }
-  JobExecutor.prototype.registerWatcher = function (fn) {
-    this._watchers.push(fn)
+  JobExecutor.prototype.registerWatcher = function (source, target, task) {
+    this._watchers.push(state => Object.keys(state[source])
+      .map(name => {
+        const input = state[source][name]
+        const cacheTarget = state.cache[target] || {}
+        const cachedResult = cacheTarget[name] || null
+
+        const changed = cachedResult === null || input !== cachedResult.input
+
+        if (changed) {
+          return Queue.createJob(task, {
+            source: source,
+            source_key: name,
+            target: target,
+            target_key: name
+          })
+        } else {
+          return null
+        }
+      })
+      .filter(task => task !== null))
   }
 
   JobExecutor.prototype.processWatchers = function (state, queue) {
@@ -48,13 +67,28 @@ define(['core/job-queue'], function (Queue) {
   JobExecutor.prototype._startJob = function (state, queue, job) {
     const id = this._counter++
 
-    const onFinished = result => {
-      this._finishedList.push({ id: id, result: result })
-      this._callback()
-    }
-
     const input = state[job.params.source][job.params.source_key]
     const fn = this._tasks[job.type]
+
+    const onFinished = (error, result) => {
+      let cacheEntry
+      if (error) {
+        cacheEntry = {
+          success: false,
+          input: input,
+          output: null
+        }
+      } else {
+        cacheEntry = {
+          success: true,
+          input: input,
+          output: result
+        }
+      }
+
+      this._finishedList.push({ id, result: cacheEntry })
+      this._callback()
+    }
 
     setTimeout(() => {
       fn(input, onFinished)
