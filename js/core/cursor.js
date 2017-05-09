@@ -45,7 +45,7 @@ define(['ast/ast-operators'], function (AstOps) {
       const cursors = findCursors(AstOps.scrollLets(AstOps.sugarifyLet(ast)))
       const currentIndex = cursors.findIndex(c => JSON.stringify(c) === JSON.stringify(cursor))
       const nextIndex = Math.max(0, Math.min(cursors.length - 1, currentIndex + offset))
-      return cursors[nextIndex]
+      return cursors[nextIndex] || []
     }
   }
 })

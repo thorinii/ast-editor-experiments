@@ -16,15 +16,13 @@ define(['ast/ast-operators', 'react'], function (AstOps, React) {
     return {className: 'code-ast-node' + cType + cBrace + cHighlightable + cSelected}
   }
 
-  function Array$intersperse (item) {
-    return function (array) {
-      let ret = []
-      array.forEach((itm, idx) => {
-        if (idx > 0) ret.push(item)
-        ret.push(itm)
-      })
-      return ret
-    }
+  function Array$intersperse (item, array) {
+    let ret = []
+    array.forEach((itm, idx) => {
+      if (idx > 0) ret.push(item)
+      ret.push(itm)
+    })
+    return ret
   }
 
   function htmlEscape (html) {
@@ -117,11 +115,14 @@ define(['ast/ast-operators', 'react'], function (AstOps, React) {
       case 'apply': {
         const fn = translate(unwrapCursor('fn', cursor), ast.fn)
         const arg = translate(unwrapCursor('arg', cursor), ast.arg)
-        const needsParens = ['binary', 'lambda', 'apply'].indexOf(ast.arg.type) !== -1
+        const fnNeedsParens = ['binary', 'lambda', 'apply', 'let+'].indexOf(ast.fn.type) !== -1
+        const argNeedsParens = ['binary', 'lambda', 'apply', 'let+'].indexOf(ast.arg.type) !== -1
+        const wrappedFn = fnNeedsParens ? [parenL, fn, parenR] : [fn]
+        const wrappedArg = argNeedsParens ? [parenL, arg, parenR] : [arg]
         return node('apply', selected,
           ifBlock(arg,
-            [fn, indent(arg)],
-            needsParens ? [fn, parenL, arg, parenR] : [fn, arg]))
+            [...wrappedFn, indent(arg)],
+            [...wrappedFn, ...wrappedArg]))
       }
 
       case 'pattern': {

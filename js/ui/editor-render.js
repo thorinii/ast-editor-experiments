@@ -1,6 +1,5 @@
 define(['react', 'ui/ast-render-react', 'ui/keymap-chart', 'ui/ui-components', 'core/selectors'], function (React, AstRenderReact, KeyMapChart, UI, Selectors) {
   const e = React.createElement
-  const tryFn = (fn, error) => { try { return fn() } catch (e) { return error(e) } }
   const intersperse = (arr, sep) => arr.reduce((a, v) => [...a, v, sep], []).slice(0, -1)
 
   const StatusView = props => e(
@@ -11,7 +10,7 @@ define(['react', 'ui/ast-render-react', 'ui/keymap-chart', 'ui/ui-components', '
   const AstView = props => e(
     'div',
     {className: 'code-text', tabIndex: 0},
-    tryFn(() => AstRenderReact.render(props.cursor, props.ast), e => ['' + e]))
+    AstRenderReact.render(props.cursor, props.ast))
 
   const CompiledJsView = props => {
     const result = props.compiled['main']

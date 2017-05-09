@@ -1,13 +1,11 @@
 define([], function () {
+  const coerceId = thing => (typeof thing === 'string' ? _variable(thing) : thing)
+  const _variable = id => ({ type: 'variable', id })
+  const _apply = (fn, arg) => ({ type: 'apply', fn, arg })
+
   return {
     ap: function (fn, ...args) {
-      return args.reduce((acc, a) => {
-        return Object.freeze({
-          type: 'apply',
-          fn: acc,
-          arg: typeof a === 'string' ? this.v(a) : a
-        })
-      }, typeof fn === 'string' ? this.v(fn) : fn)
+      return args.reduce((acc, a) => _apply(acc, coerceId(a)), coerceId(fn))
     },
 
     lam: function (...stuff) {
