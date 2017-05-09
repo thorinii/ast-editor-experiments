@@ -9,6 +9,9 @@ define(['core/job-queue'], function (JobQueue) {
     const failedCompiles = mapCache(state, 'compiled', (key, value) => [key, value])
       .filter(kv => !kv[1].success)
       .map(kv => kv[0])
+    const failedTests = mapCache(state, 'tested', (key, value) => [key, value])
+      .filter(kv => !kv[1].success)
+      .map(kv => kv[0])
 
     const runningJobs = JobQueue.running(state.jobQueue).map(job => job.type)
     const waitingJobs = JobQueue.queued(state.jobQueue).map(job => job.type)
@@ -28,6 +31,11 @@ define(['core/job-queue'], function (JobQueue) {
       if (message) message += '\n'
       level = Math.max(level, 2)
       message += 'Failed to compile: ' + failedCompiles.join(', ')
+    }
+    if (failedTests.length > 0) {
+      if (message) message += '\n'
+      level = Math.max(level, 1)
+      message += 'Failed to test: ' + failedTests.join(', ')
     }
 
     if (!message) {

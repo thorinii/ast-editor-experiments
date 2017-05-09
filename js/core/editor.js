@@ -2,8 +2,8 @@ define([
   'core/state-container', 'core/transformers',
   'core/keymap',
   'core/job-queue', 'core/job-executor',
-  'core/task-compile',
-  'core/default-keymap-config'], function (StateContainer, Transformers, KeyMap, JobQueue, JobExecutor, CompileTask, DefaultKeyMapConfig) {
+  'core/task-compile', 'core/task-test',
+  'core/default-keymap-config'], function (StateContainer, Transformers, KeyMap, JobQueue, JobExecutor, CompileTask, TestTask, DefaultKeyMapConfig) {
   'use strict'
 
   const EVENT_IMPORT_AST = 'import-ast'
@@ -23,10 +23,6 @@ define([
     cache: {}
   })
 
-  function compile (js) {
-    return eval('(' + js + ')') // eslint-disable-line
-  }
-
   function Editor () {
     this._state = new StateContainer(initialState, Transformers.reducer)
     this._keyMap = new KeyMap()
@@ -37,6 +33,7 @@ define([
     this._listener = null
 
     CompileTask(this._jobExecutor)
+    TestTask(this._jobExecutor)
 
     this._keyMap.addBindings(DefaultKeyMapConfig.bindings)
   }

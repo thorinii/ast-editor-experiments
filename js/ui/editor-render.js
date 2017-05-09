@@ -26,6 +26,19 @@ define(['react', 'ui/ast-render-react', 'ui/keymap-chart', 'ui/ui-components', '
     return e('div', {className: 'code-text'}, render)
   }
 
+  const TestJsView = props => {
+    const result = props.testResults['main']
+    let render
+    if (!result) {
+      render = 'not tested'
+    } else if (!result.success) {
+      render = 'failed to test'
+    } else {
+      render = result.output
+    }
+    return e('div', {className: 'code-text'}, render)
+  }
+
   return {
     editor: props => {
       const state = props.state
@@ -42,6 +55,10 @@ define(['react', 'ui/ast-render-react', 'ui/keymap-chart', 'ui/ui-components', '
           body: e('div', {}, 'Go and code things')
         }),
         e(KeyMapChart.render, {keyMap: props.keyMap}),
+        e(UI.pane, {
+          title: 'Test results',
+          body: e(TestJsView, {testResults: state.cache['tested'] || {}})
+        }),
         e(UI.pane, {
           title: 'Compiled JS',
           body: e(CompiledJsView, {compiled: state.cache['compiled'] || {}})

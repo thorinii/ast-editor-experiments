@@ -14,26 +14,37 @@ define(['core/job-queue'], function (Queue) {
     this._tasks[name] = fn
   }
   JobExecutor.prototype.registerWatcher = function (source, target, task) {
-    this._watchers.push(state => Object.keys(state[source])
-      .map(name => {
-        const input = state[source][name]
-        const cacheTarget = state.cache[target] || {}
-        const cachedResult = cacheTarget[name] || null
+    this._watchers.push(state => {
+      const sourceMap = (source === 'code' ? state.code : state.cache[source]) || {}
+      const targetMap = state.cache[target] || {}
 
-        const changed = cachedResult === null || input !== cachedResult.input
+      return Object.keys(sourceMap)
+        .map(key => {
+          let input = sourceMap[key]
+          if (source !== 'code') {
+            if (input.success) {
+              input = input.output
+            } else {
+              return null
+            }
+          }
 
-        if (changed) {
-          return Queue.createJob(task, {
-            source: source,
-            source_key: name,
-            target: target,
-            target_key: name
-          })
-        } else {
-          return null
-        }
-      })
-      .filter(task => task !== null))
+          const cachedResult = targetMap[key] || null
+
+          const changed = cachedResult === null || input !== cachedResult.input
+          if (changed) {
+            return Queue.createJob(task, {
+              source: source,
+              source_key: key,
+              target: target,
+              target_key: key
+            })
+          } else {
+            return null
+          }
+        })
+        .filter(task => task !== null)
+    })
   }
 
   JobExecutor.prototype.processWatchers = function (state, queue) {
@@ -67,7 +78,20 @@ define(['core/job-queue'], function (Queue) {
   JobExecutor.prototype._startJob = function (state, queue, job) {
     const id = this._counter++
 
-    const input = state[job.params.source][job.params.source_key]
+    let input
+    if (job.params.source === 'code') {
+      input = state.code[job.params.source_key]
+    } else {
+      const sourceMap = state.cache[job.params.source] || {}
+      const inputWrapped = sourceMap[job.params.source_key]
+
+      if (inputWrapped.success) {
+        input = inputWrapped.output
+      } else {
+        console.log('Skipping job because input is not success', job)
+        return queue
+      }
+    }
     const fn = this._tasks[job.type]
 
     const onFinished = (error, result) => {

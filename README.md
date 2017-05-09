@@ -28,13 +28,6 @@ There is no usage yet.
 
 ## TODO
 
-* Asynchronous compilation and testing
-  * JobQueue
-    * Dependency management
-  * Test
-    * Automatically test when compiler cache changes
-    * Render test results in output pane
-    * Show testing status & success/failure
 * Implement more commands
   * All expression types
   * Put all expression building in an Ast constructs module
