@@ -5,7 +5,7 @@
   "main": "ide-backend-main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "hjs-dev-server",
+    "start": "src/main.js",
     "build": "webpack",
     "deploy": "npm run build && surge -p public -d somedomain.com"
   },

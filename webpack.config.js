@@ -2,10 +2,11 @@ var getConfig = require('hjs-webpack')
 
 module.exports = getConfig({
   in: 'js/ide-main.js',
-  out: 'public',
+  out: 'output',
 
   output: {
-    filename: 'bundle.js'
+    filename: 'bundle.js',
+    cssFilename: 'bundle.css'
   },
 
   html: false,
