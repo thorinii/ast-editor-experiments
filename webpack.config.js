@@ -1,7 +1,7 @@
 var getConfig = require('hjs-webpack')
 
-module.exports = getConfig({
-  in: 'js/ide-main.js',
+var config = getConfig({
+  in: 'public/ide-main.js',
   out: 'output',
 
   output: {
@@ -17,3 +17,27 @@ module.exports = getConfig({
     contentBase: __dirname
   }
 })
+
+config.module.rules.push({
+  test: /\.purs$/,
+  use: [
+    {
+      loader: 'purs-loader',
+      options: {
+        src: [
+          'bower_components/purescript-*/src/**/*.purs',
+          'src/**/*.purs'
+        ],
+        bundle: false,
+        psc: 'psa',
+        watch: false,
+        pscIde: false
+      }
+    }
+  ]
+})
+
+config.resolve.modules = ['node_modules', 'bower_components']
+config.resolve.extensions.push('.purs')
+
+module.exports = config

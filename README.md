@@ -25,8 +25,6 @@ There is no usage yet.
 
 ## TODO
 
-* Serve from a NodeJS server
-  * Move to WebPack
 * Begin rewriting in Purescript <--- very important for code sanity
   * AST data type
   * AST builder functions
