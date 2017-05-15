@@ -1,7 +1,5 @@
-define(['./ast/ast-builder'], function (A) {
-  'use strict'
+import A from './ast/ast-builder'
 
-  return A.lets(
-    'test', A.l('Hello'),
-    A.bin('+', 'test', A.l(' world')))
-})
+module.exports = A.lets(
+  'test', A.l('Hello'),
+  A.bin('+', 'test', A.l(' world')))

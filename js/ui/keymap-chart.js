@@ -1,28 +1,29 @@
-define(['react', './ui-components'], function (React, UI) {
-  const e = React.createElement
+import React from 'react'
+import UI from './ui-components'
 
-  return {
-    render: function (props) {
-      const keyMap = props.keyMap
+const e = React.createElement
 
-      const bindings = keyMap.getBindings().map(binding => {
-        if (binding.action) {
-          return e('li', {className: 'binding'},
-            e('key', {}, binding.key),
-            binding.action.description)
-        } else {
-          return e('li', {className: 'binding'},
-            e('key', {}, binding.key),
-            ' -> ',
-            e('key', {}, binding.ref))
-        }
-      })
+module.exports = {
+  render: function (props) {
+    const keyMap = props.keyMap
 
-      return e(UI.pane, {
-        title: 'Key Bindings',
-        type: 'keymap',
-        body: e('ul', {}, ...bindings)
-      })
-    }
+    const bindings = keyMap.getBindings().map(binding => {
+      if (binding.action) {
+        return e('li', {className: 'binding'},
+          e('key', {}, binding.key),
+          binding.action.description)
+      } else {
+        return e('li', {className: 'binding'},
+          e('key', {}, binding.key),
+          ' -> ',
+          e('key', {}, binding.ref))
+      }
+    })
+
+    return e(UI.pane, {
+      title: 'Key Bindings',
+      type: 'keymap',
+      body: e('ul', {}, ...bindings)
+    })
   }
-})
+}

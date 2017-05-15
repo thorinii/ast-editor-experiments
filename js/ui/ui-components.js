@@ -1,19 +1,19 @@
-define(['react'], function (React) {
-  const e = React.createElement
+import React from 'react'
 
-  return {
-    pane: function (props) {
-      const title = props.title
-      const type = props.type
-      const body = props.body
+const e = React.createElement
 
-      const className = 'pane' + (type ? ' pane-' + type : '')
+module.exports = {
+  pane: function (props) {
+    const title = props.title
+    const type = props.type
+    const body = props.body
 
-      if (title) {
-        return e('div', {className: className}, e('h2', {}, title), body)
-      } else {
-        return e('div', {className: className}, body)
-      }
+    const className = 'pane' + (type ? ' pane-' + type : '')
+
+    if (title) {
+      return e('div', {className: className}, e('h2', {}, title), body)
+    } else {
+      return e('div', {className: className}, body)
     }
   }
-})
+}

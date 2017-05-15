@@ -19,11 +19,6 @@
     "url": "https://github.com/thorinii/ast-editor-experiments/issues"
   },
   "homepage": "https://github.com/thorinii/ast-editor-experiments#readme",
-  "standard": {
-    "globals": [
-      "define"
-    ]
-  },
   "dependencies": {
     "hjs-webpack": "^9.1.0",
     "react": "^15.5.4",

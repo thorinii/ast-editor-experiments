@@ -1,17 +1,17 @@
-define(['../ast/bootstrap-compiler', './job-queue'], function (Bootstrap, JobQueue) {
-  const TASK_NAME = 'compile'
+import Bootstrap from '../ast/bootstrap-compiler'
 
-  return function (executor) {
-    executor.registerWatcher('code', 'compiled', TASK_NAME)
+const TASK_NAME = 'compile'
 
-    executor.registerTask(TASK_NAME, (input, callback) => {
-      try {
-        const result = Bootstrap.translate(input)
-        callback(null, result)
-      } catch (e) {
-        console.warn('Failed to compile', e)
-        callback(e, null)
-      }
-    })
-  }
-})
+module.exports = function (executor) {
+  executor.registerWatcher('code', 'compiled', TASK_NAME)
+
+  executor.registerTask(TASK_NAME, (input, callback) => {
+    try {
+      const result = Bootstrap.translate(input)
+      callback(null, result)
+    } catch (e) {
+      console.warn('Failed to compile', e)
+      callback(e, null)
+    }
+  })
+}
