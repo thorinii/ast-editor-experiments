@@ -1,4 +1,4 @@
-define(['ast/ast-builder'], function (A) {
+define(['./ast-builder'], function (A) {
   function rewriteAstTopFirst (fn) {
     return function (ast) {
       let _thisFn = rewriteAstTopFirst(fn)

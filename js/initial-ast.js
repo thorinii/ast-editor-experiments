@@ -1,4 +1,4 @@
-define(['ast/ast-builder'], function (A) {
+define(['./ast/ast-builder'], function (A) {
   'use strict'
 
   return A.lets(

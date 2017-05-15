@@ -1,4 +1,4 @@
-define(['ast/ast-operators', 'react'], function (AstOps, React) {
+define(['../ast/ast-operators', 'react'], function (AstOps, React) {
   const ifBlock = (test, then, otherwise) => {
     const isBlock = test => Array.isArray(test) ? !!test.find(el => isBlock(el)) : test.type === 'div'
     return isBlock(test) ? then : otherwise

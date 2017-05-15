@@ -1,4 +1,4 @@
-define(['ast/ast-operators', 'core/cursor', 'core/job-queue'], function (AstOps, Cursor, JobQueue) {
+define(['../ast/ast-operators', './cursor', './job-queue'], function (AstOps, Cursor, JobQueue) {
   'use strict'
 
   const T_IMPORT_AST = 'import-ast'

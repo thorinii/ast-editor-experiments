@@ -1,9 +1,9 @@
 define([
-  'core/state-container', 'core/transformers',
-  'core/keymap',
-  'core/job-queue', 'core/job-executor',
-  'core/task-compile', 'core/task-test',
-  'core/default-keymap-config'], function (StateContainer, Transformers, KeyMap, JobQueue, JobExecutor, CompileTask, TestTask, DefaultKeyMapConfig) {
+  './state-container', './transformers',
+  './keymap',
+  './job-queue', './job-executor',
+  './task-compile', './task-test',
+  './default-keymap-config'], function (StateContainer, Transformers, KeyMap, JobQueue, JobExecutor, CompileTask, TestTask, DefaultKeyMapConfig) {
   'use strict'
 
   const EVENT_IMPORT_AST = 'import-ast'

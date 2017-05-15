@@ -1,4 +1,4 @@
-define(['core/job-queue'], function (JobQueue) {
+define(['./job-queue'], function (JobQueue) {
   const TASK_NAME = 'test'
 
   const compile = js => eval('(' + js + ')') // eslint-disable-line

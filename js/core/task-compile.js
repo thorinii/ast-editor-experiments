@@ -1,4 +1,4 @@
-define(['ast/bootstrap-compiler', 'core/job-queue'], function (Bootstrap, JobQueue) {
+define(['../ast/bootstrap-compiler', './job-queue'], function (Bootstrap, JobQueue) {
   const TASK_NAME = 'compile'
 
   return function (executor) {

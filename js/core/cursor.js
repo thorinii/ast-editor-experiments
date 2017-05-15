@@ -1,4 +1,4 @@
-define(['ast/ast-operators'], function (AstOps) {
+define(['../ast/ast-operators'], function (AstOps) {
   'use strict'
 
   const prepend = (el, arrayOfArrays) =>

@@ -1,4 +1,4 @@
-define(['core/job-queue'], function (JobQueue) {
+define(['./job-queue'], function (JobQueue) {
   const cache = (state, target) => state.cache[target] || {}
   const mapCache = (state, target, fn) => {
     const c = cache(state, target)

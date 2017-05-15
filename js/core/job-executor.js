@@ -1,4 +1,4 @@
-define(['core/job-queue'], function (Queue) {
+define(['./job-queue'], function (Queue) {
   function JobExecutor (callback, updateCache) {
     this._callback = callback
     this._updateCache = updateCache

@@ -1,4 +1,4 @@
-define(['react', 'ui/ast-render-react', 'ui/keymap-chart', 'ui/ui-components', 'core/selectors'], function (React, AstRenderReact, KeyMapChart, UI, Selectors) {
+define(['react', './ast-render-react', './keymap-chart', './ui-components', '../core/selectors'], function (React, AstRenderReact, KeyMapChart, UI, Selectors) {
   const e = React.createElement
   const intersperse = (arr, sep) => arr.reduce((a, v) => [...a, v, sep], []).slice(0, -1)
 

@@ -1,4 +1,4 @@
-define(['react', 'react-dom', 'ui/editor-render'], function (React, ReactDOM, EditorRender) {
+define(['react', 'react-dom', './editor-render'], function (React, ReactDOM, EditorRender) {
   'use strict'
 
   const translateKeyEvent = ev => {

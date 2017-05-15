@@ -1,9 +1,9 @@
-require.config({
-  baseUrl: 'js'
-})
+import Editor from './core/editor'
+import EditorUI from './ui/editor-ui'
+import initialAst from './initial-ast'
 
-define(['core/editor', 'ui/editor-ui', 'initial-ast'], function (Editor, EditorUI, initialAst) {
-  var editor = new Editor()
-  var editorUI = new EditorUI(editor, document.querySelector('.editor'))
-  editor.showAst(initialAst)
-})
+import '../css/editor.css'
+
+var editor = new Editor()
+var editorUI = new EditorUI(editor, document.querySelector('.editor'))
+editor.showAst(initialAst)

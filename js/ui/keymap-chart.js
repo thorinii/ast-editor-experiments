@@ -1,4 +1,4 @@
-define(['react', 'ui/ui-components'], function (React, UI) {
+define(['react', './ui-components'], function (React, UI) {
   const e = React.createElement
 
   return {

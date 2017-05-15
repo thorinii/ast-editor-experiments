@@ -1,8 +1,5 @@
 # Experimental AST editors
 
-See this project live at https://thorinii.github.io/ast-editor-experiments/.
-
-
 ## Aim
 
 * An editor
@@ -28,22 +25,50 @@ There is no usage yet.
 
 ## TODO
 
+* Serve from a NodeJS server
+  * Move to WebPack
+* Begin rewriting in Purescript <--- very important for code sanity
+  * AST data type
+  * AST builder functions
+  * AST manipulation functions
+  * compiler
+  * renderer
+  * use Aff for the event loop (state monad? Would make life easier with several read/writes. Yes).
+    * Main loop has type `StateT EditorState Aff a`.
+    * State changers tend to have `forall m a. MonadState EditorState m => m a`.
+  * cursor functions
+  * editor actions
+  * Job queue
+  * reducer stack & state management
+  * Job Executor
+  * most things in state should be hashable
+  * cache should be separate to state
+    * compile task is as if a constantly run function
+      * code[key] -> compiled[key]
+    * test task the same
+      * compiled[key] -> testResults[key]
+    * cached by the infrastructure with hashes
+    * job queue works behind the scenes
+* Implement some example expression types
+  * <key>l</key> replace current node with a `let x = ??? in <node>`
+  * <key>\</key> replace current node with an empty lambda
 * Implement more commands
   * All expression types
-  * Put all expression building in an Ast constructs module
+    * Add an autocomplete popup with <key>c</key>
+      * For literals, variables
+      * let 'let', lambda '\', pattern 'case'
 * More rolling up of nested things (in the core AST as well)
   * Lambda
   * Apply
   * Remove 'let' replace with 'let+' renamed
 * Database/serialisation
-  * A NodeJS server
-  * Move to WebPack
-  * Rewrite in Purescript
+  * Websocket to the NodeJS server
   * Use LevelDB (https://github.com/Level/level) with encoding=json
   * https://webpack.js.org/guides/get-started/
   * https://webpack.js.org/guides/development/#webpack-dev-middleware
   * http://www.pauleveritt.org/articles/pylyglot/webpack/
   * http://jamesknelson.com/using-es6-in-the-browser-with-babel-6-and-webpack/
+  * Offload compilation and testing
 * Implement more cursor motions
   * Hole navigation (tab)
   * Widening/shrinking
@@ -67,7 +92,7 @@ There is no usage yet.
 * 2D spatial code grid
 * Mobile interface
   * So offload as much work as possible to server
-
+* Try using a CSS pre-processor with variables
 
 ## Thoughts
 
@@ -144,3 +169,15 @@ There is no usage yet.
 * ' ' on an expression to call it as a function
 * '.' on an expression to call a function with it
 * Render a 3D dependency diagram
+* When we have types, have three modes
+  * no checking
+  * warning
+  * forbid breaking changes
+    * requires type checking synchronously in the change and vetoing it
+* Need to have some core engine code running on both server and client (ie type checker, AST tools).
+* Implement a fancy circular tool switcher thing using keyboard shortcuts (ctrl-space or something)
+  * refactoring
+  * create/delete top-levels/tests/watches/etc
+  * use ':' for the magic popup picker
+* show documentation
+* show dependencies/dependents
