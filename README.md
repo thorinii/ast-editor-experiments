@@ -26,7 +26,6 @@ There is no usage yet.
 ## TODO
 
 * Begin rewriting in Purescript <--- very important for code sanity
-  * AST data type
   * AST builder functions
   * AST manipulation functions
   * compiler

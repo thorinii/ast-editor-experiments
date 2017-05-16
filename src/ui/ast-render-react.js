@@ -1,4 +1,3 @@
-import AstOps from '../ast/ast-operators'
 import React from 'react'
 
 const ifBlock = (test, then, otherwise) => {
@@ -167,5 +166,5 @@ const translate = (cursor, ast) => {
 }
 
 module.exports = {
-  render: (cursor, ast) => translate(cursor, AstOps.scrollLets(AstOps.sugarifyLet(ast)))
+  render: (cursor, ast) => translate(cursor, ast)
 }

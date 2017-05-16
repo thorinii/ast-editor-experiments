@@ -1,4 +1,4 @@
-import AstOps from '../ast/ast-operators'
+import AstOperators from '../Ast/Operators'
 import Cursor from './cursor'
 import JobQueue from './job-queue'
 
@@ -23,10 +23,10 @@ const updateKey = (original, key, value) => {
 const astReducer = (ast, action) => {
   switch (action.type) {
     case AST_APPLY_SELECTED:
-      return AstOps.wrapApplyFn(ast)
+      return AstOperators.wrapApplyFn(ast)
 
     case AST_APPLY_WITH_SELECTED:
-      return AstOps.wrapApplyTo(ast)
+      return AstOperators.wrapApplyTo(ast)
 
     default:
       throw new TypeError('Unknown AST action: ' + action.type)

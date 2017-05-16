@@ -1,5 +1,3 @@
-import AstOps from '../ast/ast-operators'
-
 const prepend = (el, arrayOfArrays) =>
   (arrayOfArrays.length === 0) ? [[el]] : arrayOfArrays.map(a => [el].concat(a))
 
@@ -41,7 +39,7 @@ const findCursors = ast => {
 
 module.exports = {
   moveToAdjacentLeaf: function (ast, cursor, offset) {
-    const cursors = findCursors(AstOps.scrollLets(AstOps.sugarifyLet(ast)))
+    const cursors = findCursors(ast)
     const currentIndex = cursors.findIndex(c => JSON.stringify(c) === JSON.stringify(cursor))
     const nextIndex = Math.max(0, Math.min(cursors.length - 1, currentIndex + offset))
     return cursors[nextIndex] || []
