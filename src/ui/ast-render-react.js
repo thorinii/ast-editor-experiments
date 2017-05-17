@@ -1,4 +1,6 @@
 import React from 'react'
+import Ast from '../Ast'
+import AstReactView from '../UI/AstReactView.purs'
 
 const ifBlock = (test, then, otherwise) => {
   const isBlock = test => Array.isArray(test) ? !!test.find(el => isBlock(el)) : test.type === 'div'
@@ -166,5 +168,5 @@ const translate = (cursor, ast) => {
 }
 
 module.exports = {
-  render: (cursor, ast) => translate(cursor, ast)
+  render: (cursor, ast) => AstReactView.render(cursor)(ast)
 }

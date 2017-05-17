@@ -2,8 +2,7 @@ module Ast (
   LiteralValue(..),
   Expr(..),
   LetBinding(..),
-  PatternMatch(..), PatternCase(..),
-  showA
+  PatternMatch(..), PatternCase(..)
 ) where
 
 import Data.Generic (class Generic, gShow)
@@ -33,6 +32,3 @@ data Expr = Hole
 derive instance genericExpr :: Generic Expr
 instance showExpr :: Show Expr where
   show = gShow
-
-showA :: Expr -> String
-showA = show

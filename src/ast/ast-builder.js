@@ -40,7 +40,6 @@ module.exports = {
       bindings.push(new Ast.LetBinding(bindingPairs[i], coerceId(bindingPairs[i + 1])))
     }
 
-    console.log(Ast.showA(new Ast.Let(bindings, coerceId(inE))))
     return new Ast.Let(bindings, coerceId(inE))
   },
 

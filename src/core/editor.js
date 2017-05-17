@@ -6,6 +6,7 @@ import JobExecutor from './job-executor'
 import CompileTask from './task-compile'
 import TestTask from './task-test'
 import DefaultKeyMapConfig from './default-keymap-config'
+import Ast from '../Ast'
 
 const EVENT_IMPORT_AST = 'import-ast'
 const EVENT_KEY = 'key'
@@ -14,7 +15,7 @@ const EVENT_UPDATE_CACHE = 'update-cache'
 
 const initialState = Object.freeze({
   code: {
-    'main': {type: 'hole'}
+    'main': new Ast.Hole()
   },
   cursor: {
     name: 'main',
