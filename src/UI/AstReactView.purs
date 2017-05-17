@@ -2,12 +2,12 @@ module UI.AstReactView (render, maybeNull, ReactElement) where
 
 import Model.Ast
 import Data.String as String
-import Model.Cursor (Cursor(..))
 import Data.Array (concat, head, mapWithIndex, tail)
 import Data.Foldable (any, intercalate, length)
 import Data.Functor ((<$>))
 import Data.Maybe (Maybe(..), maybe)
 import Data.String (joinWith, split)
+import Model.Cursor (Cursor(..), CursorTarget(..))
 import Prelude (class Show, bind, map, show, ($), (<>), (==), (>), (>>>), (||))
 
 foreign import data ReactElement :: Type
@@ -29,15 +29,15 @@ render cursor ast =
       Literal l -> lit l selected
       Variable v -> id v selected
       Binary op args ->
-        let all = intersperse (keyword op false) $ mapWithIndex (\i a -> renderSub (show i) cursor a) args
+        let all = intersperse (keyword op false) $ mapWithIndex (\i a -> renderSub (IndexedTarget i) cursor a) args
         in node "binary" selected all
       Let bs v ->
-        let value = renderSub "value" cursor v
+        let value = renderSub ValueTarget cursor v
             joiner = if length bs > 1 then newline else text ""
             bindings = mapWithIndex (\idx (LetBinding name e) -> [
               id name false,
               keyword "=" false,
-              indent [render ((unwrapCursor (show idx) >>> unwrapCursor "value") cursor) e],
+              indent [render ((unwrapCursor (IndexedTarget idx) >>> unwrapCursor ValueTarget) cursor) e],
               joiner]) bs
             bindings' = concat bindings
         in node "let" selected [
@@ -46,7 +46,7 @@ render cursor ast =
           keyword "in" false,
           indent [value]]
       Lambda args v ->
-        let value = renderSub "value" cursor v
+        let value = renderSub ValueTarget cursor v
         in node "lambda" selected $
           [keyword "λ" false] <>
           map (\a -> id a false) args <>
@@ -66,8 +66,8 @@ render cursor ast =
               _ -> false
             parenthesiseFn a rendered = if needsParensFn a then [parenL, rendered, parenR] else [rendered]
             parenthesiseArg a rendered = if needsParensArg a then [parenL, rendered, parenR] else [rendered]
-            fn' = parenthesiseFn fn $ renderSub "fn" cursor fn
-            args' = mapWithIndex (\idx a -> parenthesiseArg a $ renderSub (show idx) cursor a) args
+            fn' = parenthesiseFn fn $ renderSub FnTarget cursor fn
+            args' = mapWithIndex (\idx a -> parenthesiseArg a $ renderSub (IndexedTarget idx) cursor a) args
             isMultiline = any (\a -> ifBlock a true false) args'
         in node "apply" selected $
           if isMultiline then
@@ -75,20 +75,20 @@ render cursor ast =
           else
             fn' <> concat args'
       Pattern arg cases ->
-        let arg' = render cursor arg
+        let arg' = renderSub ArgTarget cursor arg
             cases' = mapWithIndex (\idx (PatternCase m e) -> [case m of
                 PatternAny -> id "_" false
                 PatternLiteral l -> text (htmlEscape $ showLiteral l),
               keyword "→" false,
-              indent [render ((unwrapCursor (show idx) >>> unwrapCursor "value") cursor) e],
+              indent [render ((unwrapCursor (IndexedTarget idx) >>> unwrapCursor ValueTarget) cursor) e],
               newline]) cases
         in node "pattern" selected $
           [keyword "case" false, indent [arg']] <> concat cases' <> [newline]
 
-renderSub :: String -> Maybe Cursor -> Expr -> ReactElement
+renderSub :: CursorTarget -> Maybe Cursor -> Expr -> ReactElement
 renderSub unwrapper c ast = render (unwrapCursor unwrapper c) ast
 
-unwrapCursor :: String -> Maybe Cursor -> Maybe Cursor
+unwrapCursor :: CursorTarget -> Maybe Cursor -> Maybe Cursor
 unwrapCursor unwrapper c = do
   (Cursor cursor) <- c
   h <- head cursor

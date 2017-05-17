@@ -29,8 +29,6 @@ There is no usage yet.
   * use Aff for the event loop (state monad? Would make life easier with several read/writes. Yes).
     * Main loop has type `StateT EditorState Aff a`.
     * State changers tend to have `forall m a. MonadState EditorState m => m a`.
-  * cursor functions
-    * Use strong cursor types
   * editor actions
   * Job queue
   * reducer stack & state management
