@@ -11,6 +11,8 @@ const T_UPDATE_CACHE = 'update-cache'
 
 const AST_APPLY_SELECTED = 'apply-selected'
 const AST_APPLY_WITH_SELECTED = 'apply-with-selected'
+const AST_WRAP_IN_LET = 'wrap-in-let'
+const AST_REPLACE_WITH_LAMBDA = 'replace-with-lambda'
 
 const update = (original, patch) =>
   Object.freeze(Object.assign({}, original, patch))
@@ -20,13 +22,19 @@ const updateKey = (original, key, value) => {
   return update(original, patch)
 }
 
-const astReducer = (ast, action) => {
+const astReducer = (ast, cursor, action) => {
   switch (action.type) {
     case AST_APPLY_SELECTED:
-      return AstOperators.wrapApplyFn(ast)
+      return AstOperators.wrapApplyFn(cursor.path)(ast)
 
     case AST_APPLY_WITH_SELECTED:
-      return AstOperators.wrapApplyTo(ast)
+      return AstOperators.wrapApplyTo(cursor.path)(ast)
+
+    case AST_WRAP_IN_LET:
+      return AstOperators.wrapInLet(cursor.path)(ast)
+
+    case AST_REPLACE_WITH_LAMBDA:
+      return AstOperators.replaceWithLambda(cursor.path)(ast)
 
     default:
       throw new TypeError('Unknown AST action: ' + action.type)
@@ -42,7 +50,7 @@ const reducer = (state, action) => {
     case T_AST:
       return updateKey(state, 'code',
         updateKey(state.code, action.name,
-          astReducer(state.code[action.name], action.action)))
+          astReducer(state.code[action.name], state.cursor, action.action)))
 
     case T_CURSOR_MOTION:
       return updateKey(state, 'cursor',
@@ -98,6 +106,8 @@ module.exports = {
   /* AST actions */
   applySelected: { type: AST_APPLY_SELECTED },
   applyWithSelected: { type: AST_APPLY_WITH_SELECTED },
+  wrapInLet: { type: AST_WRAP_IN_LET },
+  replaceWithLambda: { type: AST_REPLACE_WITH_LAMBDA },
 
   /* Reducer */
   reducer: reducer

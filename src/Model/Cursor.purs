@@ -1,11 +1,12 @@
 module Model.Cursor (
   Cursor(..),
   CursorTarget(..),
+  child,
   findCursors, emptyCursor, cursorShow
 ) where
 
 import Model.Ast
-import Data.Array (concat, mapWithIndex)
+import Data.Array (concat, mapWithIndex, snoc)
 import Data.Functor (map)
 import Data.Generic (class Generic, gEq)
 import Data.Semigroup ((<>))
@@ -34,6 +35,9 @@ emptyCursor = Cursor []
 
 cursorShow :: Cursor -> String
 cursorShow = show
+
+child :: Cursor -> CursorTarget -> Cursor
+child (Cursor c) t = Cursor $ c `snoc` t
 
 findCursors :: Expr -> Array Cursor
 findCursors ast = case ast of

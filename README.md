@@ -41,9 +41,6 @@ There is no usage yet.
       * compiled[key] -> testResults[key]
     * cached by the infrastructure with hashes
     * job queue works behind the scenes
-* Implement some example expression types
-  * <key>l</key> replace current node with a `let x = ??? in <node>`
-  * <key>\</key> replace current node with an empty lambda
 * Implement more commands
   * All expression types
     * Add an autocomplete popup with <key>c</key>
