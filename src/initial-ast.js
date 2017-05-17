@@ -1,5 +1,5 @@
-import A from './ast/ast-builder'
+import Ast from './Model/Ast'
 
-module.exports = A.lets(
-  'test', A.l('Hello'),
-  A.bin('+', 'test', A.l(' world')))
+module.exports = new Ast.Let(
+  [new Ast.LetBinding('test', new Ast.Literal(new Ast.LiteralString('Hello')))],
+  new Ast.Binary('+', [new Ast.Variable('test'), new Ast.Literal(new Ast.LiteralString(' world'))]))
