@@ -1,7 +1,5 @@
 var React = require('react')
 
-exports.isSelected = function (cursor) { return cursor !== null && cursor.length === 0 }
-
 exports.text = function (t) { return t }
 
 exports.el = function (type) { return function (props) { return function (content) {
@@ -21,3 +19,10 @@ exports.ifBlock = function (test) { return function (then) { return function (ot
   var isBlock = function (test) { return Array.isArray(test) ? !!test.find(function (el) { return isBlock(el) }) : test.type === 'div' }
   return isBlock(test) ? then : otherwise
 }}}
+
+exports.isNull = function (v) { return v === null }
+
+exports._debugSeq = function (debug) { return function (v) {
+  console.log('debugseq', debug)
+  return v
+ }}

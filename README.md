@@ -33,6 +33,7 @@ There is no usage yet.
     * Main loop has type `StateT EditorState Aff a`.
     * State changers tend to have `forall m a. MonadState EditorState m => m a`.
   * cursor functions
+    * Use strong cursor types
   * editor actions
   * Job queue
   * reducer stack & state management
