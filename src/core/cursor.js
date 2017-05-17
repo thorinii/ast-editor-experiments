@@ -1,4 +1,4 @@
-import Cursor from '../Cursor'
+import Cursor from '../Model/Cursor'
 
 module.exports = {
   moveToAdjacentLeaf: function (ast, cursor, offset) {

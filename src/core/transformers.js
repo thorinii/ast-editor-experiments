@@ -1,4 +1,4 @@
-import AstOperators from '../Ast/Operators'
+import AstOperators from '../Model/Ast/Operators'
 import Cursor from './cursor'
 import JobQueue from './job-queue'
 

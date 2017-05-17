@@ -6,7 +6,7 @@ import JobExecutor from './job-executor'
 import CompileTask from './task-compile'
 import TestTask from './task-test'
 import DefaultKeyMapConfig from './default-keymap-config'
-import Ast from '../Ast'
+import Ast from '../Model/Ast'
 
 const EVENT_IMPORT_AST = 'import-ast'
 const EVENT_KEY = 'key'

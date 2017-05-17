@@ -1,4 +1,4 @@
-module Ast (
+module Model.Ast (
   LiteralValue(..),
   Expr(..),
   LetBinding(..),

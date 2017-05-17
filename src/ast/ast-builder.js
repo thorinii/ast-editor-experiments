@@ -1,4 +1,4 @@
-import Ast from '../Ast'
+import Ast from '../Model/Ast'
 
 const coerceId = thing => (typeof thing === 'string' ? new Ast.Variable(thing) : thing)
 

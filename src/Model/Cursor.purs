@@ -1,6 +1,6 @@
-module Cursor (Cursor(..), findCursors, emptyCursor, cursorShow) where
+module Model.Cursor (Cursor(..), findCursors, emptyCursor, cursorShow) where
 
-import Ast
+import Model.Ast
 import Data.Array (concat, mapWithIndex)
 import Data.Functor (map)
 import Data.Generic (class Generic, gShow)

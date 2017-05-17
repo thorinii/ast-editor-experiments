@@ -1,4 +1,4 @@
-import Bootstrap from '../Ast/BootstrapCompiler'
+import Bootstrap from '../Model/Ast/BootstrapCompiler'
 
 const TASK_NAME = 'compile'
 

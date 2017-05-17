@@ -1,8 +1,8 @@
-module Ast.Operators (
+module Model.Ast.Operators (
   wrapApplyFn, wrapApplyTo
 ) where
 
-import Ast
+import Model.Ast
 
 wrapApplyFn :: Expr -> Expr
 wrapApplyFn ast = Apply ast [Hole]

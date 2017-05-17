@@ -1,6 +1,6 @@
-module Ast.BootstrapCompiler (translate) where
+module Model.Ast.BootstrapCompiler (translate) where
 
-import Ast
+import Model.Ast
 import Data.Foldable (foldl, foldr)
 import Data.String (joinWith)
 import Prelude (map, show, ($), (<>), (==))

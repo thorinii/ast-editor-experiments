@@ -1,8 +1,8 @@
 module UI.AstReactView (render, maybeNull, ReactElement) where
 
-import Ast
+import Model.Ast
 import Data.String as String
-import Cursor (Cursor(..))
+import Model.Cursor (Cursor(..))
 import Data.Array (concat, head, mapWithIndex, tail)
 import Data.Foldable (any, intercalate, length)
 import Data.Functor ((<$>))
