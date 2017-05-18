@@ -7,23 +7,14 @@ import CompileTask from './task-compile'
 import TestTask from './task-test'
 import DefaultKeyMapConfig from './default-keymap-config'
 import Ast from '../Model/Ast'
+import Core from '../Editor/Core'
 
 const EVENT_IMPORT_AST = 'import-ast'
 const EVENT_KEY = 'key'
 const EVENT_JOB_UPDATE = 'job-update'
 const EVENT_UPDATE_CACHE = 'update-cache'
 
-const initialState = Object.freeze({
-  code: {
-    'main': new Ast.Hole()
-  },
-  cursor: {
-    name: 'main',
-    path: null
-  },
-  jobQueue: JobQueue.createQueue(),
-  cache: {}
-})
+const initialState = Core.initialState(JobQueue.createQueue())
 
 function Editor () {
   this._state = new StateContainer(initialState, Transformers.reducer)

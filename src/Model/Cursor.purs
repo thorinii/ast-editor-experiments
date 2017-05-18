@@ -1,6 +1,7 @@
 module Model.Cursor (
   Cursor(..),
   CursorTarget(..),
+  aJust, aNothing,
   child,
   findCursors, emptyCursor, cursorShow
 ) where
@@ -12,6 +13,10 @@ import Data.Generic (class Generic, gEq)
 import Data.Semigroup ((<>))
 import Data.String (joinWith)
 import Prelude (class Eq, class Show, show, ($))
+import Data.Maybe (Maybe(..))
+
+aJust a = Just a
+aNothing = Nothing
 
 data CursorTarget = ValueTarget | FnTarget | ArgTarget | IndexedTarget Int
 derive instance genericCursorTarget :: Generic CursorTarget

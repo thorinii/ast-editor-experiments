@@ -1,3 +1,4 @@
+var webpack = require('webpack')
 var getConfig = require('hjs-webpack')
 
 var config = getConfig({
@@ -17,6 +18,11 @@ var config = getConfig({
     contentBase: __dirname
   }
 })
+
+config.plugins.push(new webpack.SourceMapDevToolPlugin({
+  filename: '[file].map'
+}))
+config.devtool = 'eval-source-map'
 
 config.module.rules.push({
   test: /\.purs$/,

@@ -1,9 +1,9 @@
-module UI.AstReactView (render, maybeNull, ReactElement) where
+module UI.AstReactView (render, ReactElement) where
 
 import Model.Ast
 import Data.String as String
-import Data.Array (concat, head, mapWithIndex, tail)
-import Data.Foldable (any, intercalate, length)
+import Data.Array (concat, head, length, mapWithIndex, tail)
+import Data.Foldable (any, intercalate)
 import Data.Functor ((<$>))
 import Data.Maybe (Maybe(..), maybe)
 import Data.String (joinWith, split)
@@ -12,17 +12,13 @@ import Prelude (class Show, bind, map, show, ($), (<>), (==), (>), (>>>), (||))
 
 foreign import data ReactElement :: Type
 
-foreign import isNull :: forall a. a -> Boolean
 foreign import _debugSeq :: forall a. String -> a -> a
 debugSeq :: forall a. Show a => a -> a
 debugSeq a = _debugSeq (show a) a
 
-maybeNull :: forall a. a -> Maybe a
-maybeNull v = if isNull v then Nothing else Just v
-
 render :: Maybe Cursor -> Expr -> ReactElement
 render cursor ast =
-  let selected = maybe false (\(Cursor c) -> length c == 0) cursor --(debugSeq cursor)
+  let selected = maybe false (\(Cursor c) -> length c == 0) cursor
       intersperse v vs = intercalate [v] $ map (\i -> [i]) vs
   in case ast of
       Hole -> keyword "???" selected
