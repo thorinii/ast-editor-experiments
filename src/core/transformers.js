@@ -1,5 +1,5 @@
 import AstOperators from '../Model/Ast/Operators'
-import Cursor from './cursor'
+import Cursor from '../Model/Cursor'
 import JobQueue from './job-queue'
 
 const T_IMPORT_AST = 'import-ast'
@@ -55,7 +55,7 @@ const reducer = (state, action) => {
     case T_CURSOR_MOTION:
       return updateKey(state, 'cursor',
         updateKey(state.cursor, 'path',
-          Cursor.moveToAdjacentLeaf(state.code[state.cursor.name], state.cursor.path, action.direction)))
+          Cursor.nextAdjacentLeaf(state.code[state.cursor.name])(state.cursor.path)(action.direction)))
 
     case T_ENQUEUE_JOB:
       return updateKey(state, 'jobQueue',

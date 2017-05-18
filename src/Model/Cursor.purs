@@ -1,22 +1,20 @@
 module Model.Cursor (
   Cursor(..),
   CursorTarget(..),
-  aJust, aNothing,
   child,
-  findCursors, emptyCursor, cursorShow
+  findCursors, emptyCursor, cursorShow,
+  nextAdjacentLeaf
 ) where
 
 import Model.Ast
-import Data.Array (concat, mapWithIndex, snoc)
+import Data.Maybe
+import Data.Array (concat, findIndex, index, mapWithIndex, snoc)
+import Data.Foldable (length)
 import Data.Functor (map)
 import Data.Generic (class Generic, gEq)
 import Data.Semigroup ((<>))
 import Data.String (joinWith)
-import Prelude (class Eq, class Show, show, ($))
-import Data.Maybe (Maybe(..))
-
-aJust a = Just a
-aNothing = Nothing
+import Prelude
 
 data CursorTarget = ValueTarget | FnTarget | ArgTarget | IndexedTarget Int
 derive instance genericCursorTarget :: Generic CursorTarget
@@ -75,6 +73,14 @@ findCursors ast = case ast of
         caseMap idx (PatternCase _ e) = prepend (IndexedTarget idx) (prepend ValueTarget (findCursors e))
         cases' = concat (mapWithIndex caseMap cases)
     in cases' <> arg'
+
+
+nextAdjacentLeaf :: Expr -> Maybe Cursor -> Int -> Maybe Cursor
+nextAdjacentLeaf ast mCursor offset =
+  let cursors = findCursors ast
+      currentIndex = mCursor >>= (\current -> findIndex ((==) current) cursors)
+      nextIndex = maybe 0 (\i -> max 0 (min (length cursors - 1) (i + offset))) currentIndex
+  in index cursors nextIndex
 
 
 prepend :: CursorTarget -> Array Cursor -> Array Cursor
