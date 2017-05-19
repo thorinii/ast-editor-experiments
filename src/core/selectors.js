@@ -1,4 +1,4 @@
-import JobQueue from './job-queue'
+import JobQueue from '../Editor/JobQueue'
 
 const cache = (state, target) => state.cache[target] || {}
 const mapCache = (state, target, fn) => {
@@ -14,8 +14,8 @@ const status = state => {
     .filter(kv => !kv[1].success)
     .map(kv => kv[0])
 
-  const runningJobs = JobQueue.running(state.jobQueue).map(job => job.type)
-  const waitingJobs = JobQueue.queued(state.jobQueue).map(job => job.type)
+  const runningJobs = JobQueue.allRunning(state.jobQueue).map(job => job.type)
+  const waitingJobs = JobQueue.allQueued(state.jobQueue).map(job => job.type)
 
   let level = 0
   let message = ''

@@ -1,4 +1,4 @@
-import Queue from './job-queue'
+import JobQueue from '../Editor/JobQueue'
 
 function JobExecutor (callback, updateCache) {
   this._callback = callback
@@ -34,12 +34,15 @@ JobExecutor.prototype.registerWatcher = function (source, target, task) {
 
         const changed = cachedResult === null || input !== cachedResult.input
         if (changed) {
-          return Queue.createJob(task, {
-            source: source,
-            source_key: key,
-            target: target,
-            target_key: key
-          })
+          return {
+            type: task,
+            params: {
+              source: source,
+              source_key: key,
+              target: target,
+              target_key: key
+            }
+          }
         } else {
           return null
         }
@@ -51,7 +54,7 @@ JobExecutor.prototype.registerWatcher = function (source, target, task) {
 JobExecutor.prototype.processWatchers = function (state, queue) {
   return this._watchers.reduce((q, watcher) => {
     const tasks = watcher(state)
-    return tasks.reduce((q, task) => Queue.enqueue(q, task), q)
+    return tasks.reduce((q, task) => JobQueue.enqueue(task)(q), q)
   }, queue)
 }
 
@@ -64,9 +67,9 @@ JobExecutor.prototype._startJobs = function (state, queue) {
   let job
 
   do {
-    const r = Queue.dequeue(nextQueue)
-    nextQueue = r.nextQueue
-    job = r.job
+    const qj = JobQueue.dequeue(nextQueue)
+    nextQueue = qj.value0
+    job = qj.value1.value0 ? qj.value1.value0 : null
 
     if (job !== null) {
       nextQueue = this._startJob(state, nextQueue, job)
@@ -119,13 +122,16 @@ JobExecutor.prototype._startJob = function (state, queue, job) {
     fn(input, onFinished)
   })
 
-  return Queue.start(queue, job, id)
+  return JobQueue.start(id)(job)(queue)
 }
 
 JobExecutor.prototype._finishJobs = function (queue) {
   const nextQueue = this._finishedList.reduce((q, finished) => {
     const {id, result} = finished
-    const {nextQueue, job} = Queue.finish(q, id)
+
+    const qj = JobQueue.finish(id)(q)
+    const nextQueue = qj.value0
+    const job = qj.value1.value0 ? qj.value1.value0 : null
 
     this._updateCache(job.params.target, job.params.target_key, result)
 

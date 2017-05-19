@@ -1,12 +1,10 @@
 import StateContainer from './state-container'
 import Transformers from '../Editor/Transformers'
 import KeyMap from './keymap'
-import JobQueue from './job-queue'
 import JobExecutor from './job-executor'
 import CompileTask from './task-compile'
 import TestTask from './task-test'
 import DefaultKeyMapConfig from './default-keymap-config'
-import Ast from '../Model/Ast'
 import Core from '../Editor/Core'
 
 const EVENT_IMPORT_AST = 'import-ast'

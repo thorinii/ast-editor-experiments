@@ -26,15 +26,15 @@ There is no usage yet.
 ## TODO
 
 * Begin rewriting in Purescript <--- very important for code sanity
-  * Job queue
+  * reducer stack & state management
   * use Aff for the event loop (state monad? Would make life easier with several read/writes. Yes).
     * Main loop has type `StateT EditorState Aff a`.
     * State changers tend to have `forall m a. MonadState EditorState m => m a`.
     * Use purescript-signal channels to publish events
-  * reducer stack & state management
   * Job Executor
   * most things in state should be hashable
-  * cache should be separate to state
+  * Split Jobs and cached functions; cache should be separate to state
+    * Jobs shouldn't care about sources and targets
     * compile task is as if a constantly run function
       * code[key] -> compiled[key]
     * test task the same
