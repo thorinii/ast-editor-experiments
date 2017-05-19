@@ -31,7 +31,6 @@ There is no usage yet.
     * Main loop has type `StateT EditorState Aff a`.
     * State changers tend to have `forall m a. MonadState EditorState m => m a`.
     * Use purescript-signal channels to publish events
-  * editor actions
   * reducer stack & state management
   * Job Executor
   * most things in state should be hashable

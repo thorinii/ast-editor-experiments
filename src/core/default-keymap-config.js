@@ -1,32 +1,32 @@
-import Transformers from './transformers'
+import Transformers from '../Editor/Transformers'
 
 const bindings = [
   {
     key: '<space>',
     action: {
       description: 'Call the current expression as a function',
-      action: Transformers.ast(Transformers.applySelected)
+      action: new Transformers.AstAction(Transformers.ApplySelected.value)
     }
   },
   {
     key: '.',
     action: {
       description: 'Call a function with the current expression',
-      action: Transformers.ast(Transformers.applyWithSelected)
+      action: new Transformers.AstAction(Transformers.ApplyWithSelected.value)
     }
   },
   {
     key: 'l',
     action: {
       description: 'Wrap the current expression in a let',
-      action: Transformers.ast(Transformers.wrapInLet)
+      action: new Transformers.AstAction(Transformers.WrapInLet.value)
     }
   },
   {
     key: '\\',
     action: {
       description: 'Replace the current expression with a lambda',
-      action: Transformers.ast(Transformers.replaceWithLambda)
+      action: new Transformers.AstAction(Transformers.ReplaceWithLambda.value)
     }
   },
 
@@ -34,14 +34,14 @@ const bindings = [
     key: '<left>',
     action: {
       description: 'Move to the previous leaf node',
-      action: Transformers.cursorMotion(-1)
+      action: new Transformers.CursorAction(-1)
     }
   },
   {
     key: '<right>',
     action: {
       description: 'Move to the next leaf node',
-      action: Transformers.cursorMotion(1)
+      action: new Transformers.CursorAction(1)
     }
   },
 ]

@@ -1,5 +1,5 @@
 import StateContainer from './state-container'
-import Transformers from './transformers'
+import Transformers from '../Editor/Transformers'
 import KeyMap from './keymap'
 import JobQueue from './job-queue'
 import JobExecutor from './job-executor'
@@ -14,10 +14,10 @@ const EVENT_KEY = 'key'
 const EVENT_JOB_UPDATE = 'job-update'
 const EVENT_UPDATE_CACHE = 'update-cache'
 
-const initialState = Core.initialState(JobQueue.createQueue())
+const initialState = Core.initialState
 
 function Editor () {
-  this._state = new StateContainer(initialState, Transformers.reducer)
+  this._state = new StateContainer(initialState, (state, action) => Transformers.reducer(action)(state))
   this._keyMap = new KeyMap()
   this._jobExecutor = new JobExecutor(
     () => { this._dispatchEvent({ type: EVENT_JOB_UPDATE }) },
@@ -59,7 +59,7 @@ Editor.prototype._dispatchEvent = function (ev) {
 Editor.prototype._processEvent = function (ev) {
   switch (ev.type) {
     case EVENT_IMPORT_AST: {
-      this._state.apply(Transformers.importAst(ev.ast))
+      this._state.apply(new Transformers.ImportAstAction('main', ev.ast))
       break
     }
 
@@ -79,7 +79,7 @@ Editor.prototype._processEvent = function (ev) {
     }
 
     case EVENT_UPDATE_CACHE: {
-      this._state.apply(Transformers.updateCache(ev.target, ev.key, ev.value))
+      this._state.apply(new Transformers.UpdateCache(ev.target, ev.key, ev.value))
       break
     }
 
@@ -94,14 +94,14 @@ Editor.prototype._processJobWatchers = function () {
   const state = this.getState()
   const queue = state.jobQueue
   const nextQueue = this._jobExecutor.processWatchers(state, queue)
-  this._state.apply(Transformers.updateJobQueue(nextQueue))
+  this._state.apply(new Transformers.UpdateJobQueue(nextQueue))
 }
 
 Editor.prototype._processJobQueue = function () {
   const state = this.getState()
   const queue = state.jobQueue
   const nextQueue = this._jobExecutor.process(state, queue)
-  this._state.apply(Transformers.updateJobQueue(nextQueue))
+  this._state.apply(new Transformers.UpdateJobQueue(nextQueue))
 }
 
 module.exports = Editor

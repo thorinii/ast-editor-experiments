@@ -46,9 +46,8 @@ const TestJsView = props => {
 module.exports = {
   editor: props => {
     const state = props.state
-    console.log(state.cursor.path)
 
-    const pane = e('div', {className: 'pane'}, e(AstView, {ast: state.code['main'], cursor: state.cursor.path}))
+    const pane = e('div', {className: 'pane'}, e(AstView, {ast: state.code['main'], cursor: state.cursor.value1}))
 
     const sidebar = e('div', {className: 'sidebar'},
       e(UI.pane, {
