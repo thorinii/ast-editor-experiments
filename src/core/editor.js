@@ -1,4 +1,4 @@
-import StateContainer from './state-container'
+import StateContainer from '../Editor/StateContainer'
 import Transformers from '../Editor/Transformers'
 import KeyMap from './keymap'
 import JobExecutor from './job-executor'
@@ -15,7 +15,7 @@ const EVENT_UPDATE_CACHE = 'update-cache'
 const initialState = Core.initialState
 
 function Editor () {
-  this._state = new StateContainer(initialState, (state, action) => Transformers.reducer(action)(state))
+  this._state = StateContainer.create(Transformers.reducer)(initialState)()
   this._keyMap = new KeyMap()
   this._jobExecutor = new JobExecutor(
     () => { this._dispatchEvent({ type: EVENT_JOB_UPDATE }) },
@@ -33,7 +33,7 @@ Editor.prototype.setListener = function (listener) {
   if (this._listener !== null) throw new Error('Can only set one listener on the Editor')
   this._listener = listener
 }
-Editor.prototype.getState = function () { return this._state.get() }
+Editor.prototype.getState = function () { return StateContainer.get(this._state)() }
 Editor.prototype.getKeyMap = function () { return this._keyMap }
 
 Editor.prototype.showAst = function (ast) {
@@ -57,14 +57,14 @@ Editor.prototype._dispatchEvent = function (ev) {
 Editor.prototype._processEvent = function (ev) {
   switch (ev.type) {
     case EVENT_IMPORT_AST: {
-      this._state.apply(new Transformers.ImportAstAction('main', ev.ast))
+      StateContainer.apply(new Transformers.ImportAstAction('main', ev.ast))(this._state)()
       break
     }
 
     case EVENT_KEY: {
       const action = this._keyMap.getAction(ev.key)
       if (action !== undefined) {
-        this._state.apply(action)
+        StateContainer.apply(action)(this._state)()
       } else {
         console.log('unbound key:', ev.key)
       }
@@ -77,7 +77,7 @@ Editor.prototype._processEvent = function (ev) {
     }
 
     case EVENT_UPDATE_CACHE: {
-      this._state.apply(new Transformers.UpdateCache(ev.target, ev.key, ev.value))
+      StateContainer.apply(new Transformers.UpdateCache(ev.target, ev.key, ev.value))(this._state)()
       break
     }
 
@@ -92,14 +92,14 @@ Editor.prototype._processJobWatchers = function () {
   const state = this.getState()
   const queue = state.jobQueue
   const nextQueue = this._jobExecutor.processWatchers(state, queue)
-  this._state.apply(new Transformers.UpdateJobQueue(nextQueue))
+  StateContainer.apply(new Transformers.UpdateJobQueue(nextQueue))(this._state)()
 }
 
 Editor.prototype._processJobQueue = function () {
   const state = this.getState()
   const queue = state.jobQueue
   const nextQueue = this._jobExecutor.process(state, queue)
-  this._state.apply(new Transformers.UpdateJobQueue(nextQueue))
+  StateContainer.apply(new Transformers.UpdateJobQueue(nextQueue))(this._state)()
 }
 
 module.exports = Editor

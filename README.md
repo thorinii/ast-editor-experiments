@@ -26,7 +26,6 @@ There is no usage yet.
 ## TODO
 
 * Begin rewriting in Purescript <--- very important for code sanity
-  * reducer stack & state management
   * selectors
   * ui-components
   * keymap-chart
