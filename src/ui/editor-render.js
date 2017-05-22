@@ -1,7 +1,7 @@
 import React from 'react'
 import AstReactView from '../UI/AstReactView.purs'
 import KeyMapChart from './keymap-chart'
-import UI from './ui-components'
+import Components from '../UI/Components.purs'
 import Selectors from '../core/selectors'
 
 const e = React.createElement
@@ -50,23 +50,15 @@ module.exports = {
     const pane = e('div', {className: 'pane'}, e(AstView, {ast: state.code['main'], cursor: state.cursor.value1}))
 
     const sidebar = e('div', {className: 'sidebar'},
-      e(UI.pane, {
-        type: 'status pane-noseparator',
-        body: e(StatusView, Selectors.status(state))
-      }),
-      e(UI.pane, {
-        title: 'Instructions',
-        body: e('div', {}, 'Go and code things')
-      }),
+      Components['pane\'']('state pane-noseparator')(
+        e(StatusView, Selectors.status(state))),
+      Components.pane('instructions')('Instructions')(
+        e('div', {}, 'Go and code things')),
       e(KeyMapChart.render, {keyMap: props.keyMap}),
-      e(UI.pane, {
-        title: 'Test results',
-        body: e(TestJsView, {testResults: state.cache['tested'] || {}})
-      }),
-      e(UI.pane, {
-        title: 'Compiled JS',
-        body: e(CompiledJsView, {compiled: state.cache['compiled'] || {}})
-      }))
+      Components.pane('test')('Test results')(
+        e(TestJsView, {testResults: state.cache['tested'] || {}})),
+      Components.pane('compiled')('Compiled JS')(
+        e(CompiledJsView, {compiled: state.cache['compiled'] || {}})))
 
     return e('div', {},
       e('div', {className: 'container'}, pane, sidebar))

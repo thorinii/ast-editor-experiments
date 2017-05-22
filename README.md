@@ -26,8 +26,9 @@ There is no usage yet.
 ## TODO
 
 * Begin rewriting in Purescript <--- very important for code sanity
+  * editor
   * selectors
-  * ui-components
+  * keymap
   * keymap-chart
   * editor-render
   * use Aff for the event loop (state monad? Would make life easier with several read/writes. Yes).

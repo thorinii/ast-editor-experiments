@@ -1,5 +1,5 @@
 import React from 'react'
-import UI from './ui-components'
+import Components from '../UI/Components.purs'
 
 const e = React.createElement
 
@@ -20,10 +20,7 @@ module.exports = {
       }
     })
 
-    return e(UI.pane, {
-      title: 'Key Bindings',
-      type: 'keymap',
-      body: e('ul', {}, ...bindings)
-    })
+    return Components.pane('keymap')('Key Bindings')(
+      e('ul', {}, ...bindings))
   }
 }
