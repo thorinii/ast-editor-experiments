@@ -1,5 +1,5 @@
 import React from 'react'
-import AstRenderReact from './ast-render-react'
+import AstReactView from '../UI/AstReactView.purs'
 import KeyMapChart from './keymap-chart'
 import UI from './ui-components'
 import Selectors from '../core/selectors'
@@ -15,7 +15,7 @@ const StatusView = props => e(
 const AstView = props => e(
   'div',
   {className: 'code-text', tabIndex: 0},
-  AstRenderReact.render(props.cursor, props.ast))
+  AstReactView.render(props.cursor)(props.ast))
 
 const CompiledJsView = props => {
   const result = props.compiled['main']

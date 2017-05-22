@@ -27,6 +27,10 @@ There is no usage yet.
 
 * Begin rewriting in Purescript <--- very important for code sanity
   * reducer stack & state management
+  * selectors
+  * ui-components
+  * keymap-chart
+  * editor-render
   * use Aff for the event loop (state monad? Would make life easier with several read/writes. Yes).
     * Main loop has type `StateT EditorState Aff a`.
     * State changers tend to have `forall m a. MonadState EditorState m => m a`.
