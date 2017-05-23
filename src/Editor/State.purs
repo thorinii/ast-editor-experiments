@@ -1,5 +1,6 @@
 module Editor.State (
-  EditorState(..), EditorCursor(..)
+  EditorState(..), EditorCursor(..),
+  code, cursor, jobQueue, cache
 ) where
 
 import Data.Maybe (Maybe)
@@ -16,3 +17,15 @@ newtype EditorState = EditorState {
   jobQueue :: JobQueue,
   cache :: StrMap (StrMap {})
 }
+
+code :: EditorState -> StrMap Expr
+code (EditorState c) = c.code
+
+cursor :: EditorState -> EditorCursor
+cursor (EditorState c) = c.cursor
+
+jobQueue :: EditorState -> JobQueue
+jobQueue (EditorState c) = c.jobQueue
+
+cache :: EditorState -> StrMap (StrMap {})
+cache (EditorState c) = c.cache
