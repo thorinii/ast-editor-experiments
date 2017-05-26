@@ -8,8 +8,8 @@ import Editor.JobQueue as JobQueue
 import Model.Ast.Operators as Ops
 import Model.Cursor as Cursor
 import Data.Maybe (Maybe(..), maybe)
-import Editor.JobQueue (JobQueue)
-import Editor.State (EditorState(..), EditorCursor(..))
+import Editor.JobQueue (JobQueue, Job)
+import Editor.State (EditorState(..), EditorCursor(..), JobResult)
 import Model.Ast (Expr)
 import Model.Cursor (Cursor)
 import Prelude (id, ($), (<<<), (>>=))
@@ -48,9 +48,9 @@ astReducer action cursor expr = case action of
 data Action = ImportAstAction String Expr
             | AstAction AstAction
             | CursorAction Int
-            | EnqueueJobAction {}
+            | EnqueueJobAction Job
             | UpdateJobQueue JobQueue
-            | UpdateCache String String {}
+            | UpdateCache String String JobResult
 
 data AstAction = ApplySelected
                | ApplyWithSelected

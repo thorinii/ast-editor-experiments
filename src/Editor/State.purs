@@ -1,5 +1,6 @@
 module Editor.State (
   EditorState(..), EditorCursor(..),
+  JobResult(..),
   code, cursor, jobQueue, cache
 ) where
 
@@ -15,7 +16,13 @@ newtype EditorState = EditorState {
   code :: StrMap Expr,
   cursor :: EditorCursor,
   jobQueue :: JobQueue,
-  cache :: StrMap (StrMap {})
+  cache :: StrMap (StrMap JobResult)
+}
+
+newtype JobResult = JobResult {
+  success :: Boolean,
+  input :: {},
+  output :: {}
 }
 
 code :: EditorState -> StrMap Expr
@@ -27,5 +34,5 @@ cursor (EditorState c) = c.cursor
 jobQueue :: EditorState -> JobQueue
 jobQueue (EditorState c) = c.jobQueue
 
-cache :: EditorState -> StrMap (StrMap {})
+cache :: EditorState -> StrMap (StrMap JobResult)
 cache (EditorState c) = c.cache

@@ -16,6 +16,22 @@
 * Tests can be spatially located close to the code
   * Automatically run when things change
 * Possibly usable on a phone-sized/touch-based device
+* Simple debugger
+
+### Anti-goals
+
+It shouldn't be:
+
+* Really slow, locking up at small things and taking ages to type-check/compile/test
+* Heavily mouse driven
+* Hard to remember or find keyboard shortcuts
+* Hard to find code
+* Hard to read code
+* Hard to find documentation for code (libraries and project code)
+* Hard to see dependencies between things
+* Hard to use/add/control libraries
+* Painful or annoying to write tests
+* In your way when doing non-type-preserving edits
 
 
 ## Usage
@@ -26,24 +42,32 @@ There is no usage yet.
 ## TODO
 
 * Begin rewriting in Purescript <--- very important for code sanity
-  * selectors
   * keymap
   * keymap-chart
+  * initial-ast
+  * default-keymap-config
   * Job Executor
+  * task-compile
+  * task-test
+  * selectors
   * editor-render
+  * editor-ui
   * use Aff for the event loop (state monad? Would make life easier with several read/writes. Yes).
     * Main loop has type `StateT EditorState Aff a`.
     * State changers tend to have `forall m a. MonadState EditorState m => m a`.
     * Use purescript-signal channels to publish events
+      * foldP (\ev state -> runStateM state (... ev))
   * most things in state should be hashable
   * Split Jobs and cached functions; cache should be separate to state
     * Jobs shouldn't care about sources and targets
+      * They are `Aff (...) Transformers.Action` with Exceptions
     * compile task is as if a constantly run function
       * code[key] -> compiled[key]
     * test task the same
       * compiled[key] -> testResults[key]
     * cached by the infrastructure with hashes
     * job queue works behind the scenes
+  * Where should JobExecutor and KeyMap etc state go?
 * Implement more commands
   * Implement literal entry/variable picker asap aka the autocomplete popup
   * All expression types
@@ -69,6 +93,7 @@ There is no usage yet.
 * Array/object literals
 * Fix editor pane layout/wrapping etc. Either fix the flexbox or use something else.
 * Better one-line rendering support (use complexity or approximate length)
+  * Also render `let` and `where` with variables starting on the same line
 * Keyboard command binding (use proper key-binding system)
 * Attach comments to any node
 * Switch to a Purescript AST
@@ -86,6 +111,7 @@ There is no usage yet.
 * Mobile interface
   * So offload as much work as possible to server
 * Try using a CSS pre-processor with variables
+
 
 ## Thoughts
 
@@ -174,3 +200,19 @@ There is no usage yet.
   * use ':' for the magic popup picker
 * show documentation
 * show dependencies/dependents
+* toplevels have aliased-externals
+  * corresponding to imports
+  * eg "in this toplevel, `Just` refers to `Data.Maybe.Just`"
+* "typeof <selected>" command
+* ":" action picker
+  * key commands must be stable
+  * refactorings: rename, extract, inline
+* ast contexts: expression, pattern case, let binding, toplevel, type
+* toplevels: binding, eval (expr with Show OR Renderable), test, type class
+* think about how it could actually be used
+  * ie how could you write the editor in the editor
+  * launched from cli
+  * continuously building to a bundle.js or something
+* Debugger
+  * Can't pause the execution (without browser support)
+  * Can record things as they happen

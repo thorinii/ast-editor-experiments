@@ -27,7 +27,7 @@ data Editor = Editor (StateContainer EditorState Transformers.Action)
 data Event = ImportAstEvent Expr
            | KeyEvent Key
            | JobUpdateEvent
-           | UpdateCacheEvent String String {}
+           | UpdateCacheEvent String String State.JobResult
 
 type Listener = {}
 type KeyMap = {}
@@ -108,7 +108,7 @@ callListener (Editor _ _ _ listenerM _) = case listenerM of
   Nothing -> pure unit
 
 foreign import _makeKeyMap :: KeyMap
-foreign import _createJobExecutor :: forall e. Event -> (String -> String -> {} -> Event) -> Ref (Event -> Eff (ref :: REF) Unit) -> Eff (ref :: REF | e) JobExecutor
+foreign import _createJobExecutor :: forall e. Event -> (String -> String -> State.JobResult -> Event) -> Ref (Event -> Eff (ref :: REF) Unit) -> Eff (ref :: REF | e) JobExecutor
 foreign import _installCompileTask :: forall e. JobExecutor -> Eff (ref :: REF | e) Unit
 foreign import _installTestTask :: forall e. JobExecutor -> Eff (ref :: REF | e) Unit
 foreign import _installKeyBindings :: KeyMap -> KeyMap

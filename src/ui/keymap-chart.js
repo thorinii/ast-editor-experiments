@@ -20,6 +20,7 @@ module.exports = {
       }
     })
 
+    // TODO: this is a component that can be placed in a pane, not a pane
     return Components.pane('keymap')('Key Bindings')(
       e('ul', {}, ...bindings))
   }

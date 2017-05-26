@@ -14,7 +14,7 @@ import Data.StrMap (StrMap)
 import Data.Tuple (Tuple(..))
 import Prelude (id, not, ($), (<$>))
 
-type Job = {}
+type Job = { type :: String }
 
 -- TODO: abstract over job (make a type variable with Eq)
 data JobQueue = JobQueue (Array Job) (StrMap Job)
