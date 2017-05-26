@@ -39,24 +39,27 @@ It shouldn't be:
 There is no usage yet.
 
 
+## Milestones
+
+1. An expression editor
+  * Enter expressions (literals, variables, lambdas, applies, binaries, lets, and patterns)
+  * Modify expressions
+  * Evaluate on the fly and render the result
+
+
 ## TODO
 
 * Begin rewriting in Purescript <--- very important for code sanity
   * keymap
-  * keymap-chart
-  * initial-ast
   * default-keymap-config
   * Job Executor
   * task-compile
   * task-test
-  * selectors
-  * editor-render
-  * editor-ui
-  * use Aff for the event loop (state monad? Would make life easier with several read/writes. Yes).
-    * Main loop has type `StateT EditorState Aff a`.
-    * State changers tend to have `forall m a. MonadState EditorState m => m a`.
-    * Use purescript-signal channels to publish events
+  * Use a signal to trigger the event loop
+    * Event loop has type `StateT EditorState Eff a`
+    * Outer signaller uses purescript-signal channels to publish events
       * foldP (\ev state -> runStateM state (... ev))
+    * State changers tend to have `forall m a. MonadState EditorState m => m a`.
   * most things in state should be hashable
   * Split Jobs and cached functions; cache should be separate to state
     * Jobs shouldn't care about sources and targets
@@ -68,6 +71,10 @@ There is no usage yet.
     * cached by the infrastructure with hashes
     * job queue works behind the scenes
   * Where should JobExecutor and KeyMap etc state go?
+  * selectors
+  * keymap-chart
+  * editor-render
+  * editor-ui
 * Implement more commands
   * Implement literal entry/variable picker asap aka the autocomplete popup
   * All expression types
