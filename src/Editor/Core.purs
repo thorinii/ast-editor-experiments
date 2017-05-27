@@ -4,10 +4,13 @@ module Editor.Core (
 
 import Editor.State
 import Data.StrMap as Map
+import Editor.DefaultKeyBindings as DKB
 import Editor.JobQueue as JobQueue
-import Model.Ast as Ast
-import Data.Maybe (Maybe(..))
 import Editor.KeyMap as KeyMap
+import Model.Ast as Ast
+import Data.Foldable (foldl)
+import Data.Maybe (Maybe(..))
+import Prelude (flip)
 
 initialState :: EditorState
 initialState = EditorState {
@@ -15,5 +18,5 @@ initialState = EditorState {
   cursor: EditorCursor "main" Nothing,
   jobQueue: JobQueue.empty,
   cache: Map.empty,
-  keyMap: KeyMap.empty
+  keyMap: foldl (flip KeyMap.addKeyBindingAction) KeyMap.empty DKB.bindings
 }

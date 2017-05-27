@@ -36,12 +36,6 @@ exports._installTestTask = function (jobExecutor) {
   }
 }
 
-exports._installKeyBindings = function (keyMap) {
-  return DefaultKeyMapConfig.bindings.reduce(function (acc, binding) {
-    return KeyMap.addKeyBindingAction(binding)(acc)
-  }, keyMap)
-}
-
 exports._processJobWatchers = function (state) {
   return function (queue) {
     return function (executor) {

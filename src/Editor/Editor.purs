@@ -7,6 +7,7 @@ module Editor.Editor (
 
 import Editor.Core as Core
 import Editor.JobExecutor as JobExecutor
+import Editor.KeyMap as KeyMap
 import Editor.State as State
 import Editor.StateContainer as StateContainer
 import Editor.Threading as Threading
@@ -18,15 +19,13 @@ import Control.Monad.Eff.Class (liftEff)
 import Control.Monad.Eff.Ref (REF, Ref, newRef, writeRef)
 import Data.Maybe (Maybe(..), maybe)
 import Editor.JobQueue (JobQueue, Job)
-import Editor.KeyMap as KeyMap
 import Editor.KeyMap (KeyMap)
 import Editor.State (EditorState)
 import Editor.StateContainer (StateContainer)
 import Model.Ast (Expr)
-import Prelude (Unit, bind, discard, pure, unit, ($))
+import Prelude (Unit, bind, discard, map, pure, unit, ($))
 
 data Editor = Editor (StateContainer EditorState State.Action)
-                     (KeyMap State.Action)
                      JobExecutor
                      (Maybe Listener)
                      (Ref (Event -> Eff (ref :: REF) Unit)) -- TODO: make this a Signal
@@ -45,7 +44,6 @@ create :: forall e. Aff (ref :: REF, avar :: AVAR | e) Editor
 create = do
   dispatchRef <- liftEff $ newRef (\ev -> pure unit)
   state <- liftEff $ StateContainer.create Transformers.reducer Core.initialState
-  let keyMap = _installKeyBindings KeyMap.empty
   executorQueue <- Threading.createQueue
   actionQueue <- Threading.createQueue
   liftEff $ JobExecutor.start (JobExecutor.createExecutorState {} executorQueue actionQueue)
@@ -53,21 +51,21 @@ create = do
   liftEff $ _installCompileTask jobExecutor
   liftEff $ _installTestTask jobExecutor
   Threading.putQueue executorQueue {type: "ho ho"}
-  let editor' = Editor state keyMap jobExecutor Nothing dispatchRef executorQueue actionQueue
+  let editor' = Editor state jobExecutor Nothing dispatchRef executorQueue actionQueue
   liftEff $ writeRef dispatchRef (\ev -> dispatchEvent ev editor')
   pure editor'
 
 setListener :: forall e. Listener -> Editor -> Eff (ref :: REF | e) Editor
-setListener listener (Editor s k e _ dispatchRef eq aq) = do
-  let editor' = Editor s k e (Just listener) dispatchRef eq aq
+setListener listener (Editor s e _ dispatchRef eq aq) = do
+  let editor' = Editor s e (Just listener) dispatchRef eq aq
   writeRef dispatchRef (\ev -> dispatchEvent ev editor')
   pure editor'
 
 getState :: forall e. Editor -> Eff (ref :: REF | e) EditorState
-getState (Editor s _ _ _ _ _ _) = StateContainer.get s
+getState (Editor s _ _ _ _ _) = StateContainer.get s
 
-getKeyMap :: Editor -> KeyMap State.Action
-getKeyMap (Editor _ k _ _ _ _ _) = k
+getKeyMap :: forall e. Editor -> Eff (ref :: REF | e) (KeyMap State.Action)
+getKeyMap e = map (State.keyMap) (getState e)
 
 showAst :: forall e. Expr -> Editor -> Eff (ref :: REF | e) Unit
 showAst ast = dispatchEvent (ImportAstEvent ast)
@@ -85,8 +83,9 @@ dispatchEvent ev editor = do
 
 
 processEvent :: forall e. Event -> Editor -> Eff (ref :: REF | e) Unit
-processEvent ev ed@(Editor sc keyMap _ _ _ _ _) = do
+processEvent ev ed@(Editor sc _ _ _ _ _) = do
   state <- getState ed
+  keyMap <- getKeyMap ed
   case ev of
     ImportAstEvent ast ->
       StateContainer.apply (State.ImportAstAction "main" ast) sc
@@ -101,7 +100,7 @@ processEvent ev ed@(Editor sc keyMap _ _ _ _ _) = do
       StateContainer.apply (State.UpdateCache target key value) sc
 
 processJobWatchers :: forall e. Editor -> Eff (ref :: REF | e) Unit
-processJobWatchers ed@(Editor sc _ executor _ _ _ _) = do
+processJobWatchers ed@(Editor sc executor _ _ _ _) = do
   state <- getState ed
   let queue = State.jobQueue state
   queue' <- _processJobWatchers state queue executor
@@ -109,21 +108,20 @@ processJobWatchers ed@(Editor sc _ executor _ _ _ _) = do
 
 
 processJobQueue :: forall e. Editor -> Eff (ref :: REF | e) Unit
-processJobQueue ed@(Editor sc _ executor _ _ _ _) = do
+processJobQueue ed@(Editor sc executor _ _ _ _) = do
   state <- getState ed
   let queue = State.jobQueue state
   queue' <- _processJobQueue state queue executor
   StateContainer.apply (State.UpdateJobQueue queue') sc
 
 callListener :: forall e. Editor -> Eff (ref :: REF | e) Unit
-callListener (Editor _ _ _ listenerM _ _ _) = case listenerM of
+callListener (Editor _ _ listenerM _ _ _) = case listenerM of
   Just listener -> _call listener
   Nothing -> pure unit
 
 foreign import _createJobExecutor :: forall e. Event -> (String -> String -> State.JobResult -> Event) -> Ref (Event -> Eff (ref :: REF) Unit) -> Eff (ref :: REF | e) JobExecutor
 foreign import _installCompileTask :: forall e. JobExecutor -> Eff (ref :: REF | e) Unit
 foreign import _installTestTask :: forall e. JobExecutor -> Eff (ref :: REF | e) Unit
-foreign import _installKeyBindings :: KeyMap State.Action -> KeyMap State.Action
 
 foreign import _processJobWatchers :: forall e. EditorState -> JobQueue -> JobExecutor -> Eff e JobQueue
 foreign import _processJobQueue :: forall e. EditorState -> JobQueue -> JobExecutor -> Eff e JobQueue

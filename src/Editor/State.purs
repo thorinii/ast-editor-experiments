@@ -2,7 +2,7 @@ module Editor.State (
   EditorState(..), EditorCursor(..),
   Action(..), AstAction(..),
   JobResult(..),
-  code, cursor, jobQueue, cache
+  code, cursor, jobQueue, cache, keyMap
 ) where
 
 import Editor.JobQueue
@@ -52,3 +52,6 @@ jobQueue (EditorState c) = c.jobQueue
 
 cache :: EditorState -> StrMap (StrMap JobResult)
 cache (EditorState c) = c.cache
+
+keyMap :: EditorState -> KeyMap Action
+keyMap (EditorState c) = c.keyMap
