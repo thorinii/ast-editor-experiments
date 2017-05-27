@@ -9,16 +9,9 @@ module.exports = {
     const keyMap = props.keyMap
 
     const bindings = KeyMap.getBindings(keyMap).map(binding => {
-      if (binding.action.constructor.name === 'Left') {
-        return e('li', {className: 'binding'},
-          e('key', {}, binding.key),
-          binding.action.value0.description)
-      } else {
-        return e('li', {className: 'binding'},
-          e('key', {}, binding.key),
-          ' -> ',
-          e('key', {}, binding.action.value0.ref))
-      }
+      return e('li', {className: 'binding'},
+        e('key', {}, binding.key),
+        binding.action.description)
     })
 
     // TODO: this is a component that can be placed in a pane, not a pane

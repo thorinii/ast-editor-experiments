@@ -2,7 +2,7 @@ module Editor.KeyMap (
   KeyMap, KeyBinding, KeyAction(..), KeyBindingAction,
   empty,
   isPassthrough,
-  addBinding, addMappedBinding, addKeyBindingAction,
+  addBinding, addKeyBindingAction,
   getAction,
   getBindings,
   makeAction, bindToAction
@@ -10,17 +10,15 @@ module Editor.KeyMap (
 
 import Data.StrMap as StrMap
 import Data.Array (elem, snoc)
-import Data.Either (Either(..))
 import Data.Generic (class Generic, gEq)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe)
 import Data.StrMap (StrMap)
-import Editor.Transformers (Action)
 import Prelude (class Eq, map)
 
 newtype KeyBinding = KeyBinding String
-newtype KeyAction = KeyAction { action :: Action, description :: String }
-newtype KeyBindingAction = KeyBindingAction { key :: KeyBinding, action :: Either KeyAction KeyBinding }
-newtype KeyMap = KeyMap { bindings :: Array KeyBindingAction, actions :: StrMap (Either KeyAction KeyBinding)}
+newtype KeyAction a = KeyAction { action :: a, description :: String }
+newtype KeyBindingAction a = KeyBindingAction { key :: KeyBinding, action :: KeyAction a }
+newtype KeyMap a = KeyMap { bindings :: Array (KeyBindingAction a), actions :: StrMap (KeyAction a) }
 
 derive instance genericKeyBinding :: Generic KeyBinding
 instance eqKeyBinding :: Eq KeyBinding where
@@ -36,37 +34,31 @@ passthrough = map KeyBinding [
 isPassthrough :: KeyBinding -> Boolean
 isPassthrough key = elem key passthrough
 
-empty :: KeyMap
+empty :: forall a. KeyMap a
 empty = KeyMap { bindings: [], actions: StrMap.empty }
 
-addBinding :: KeyBinding -> KeyAction -> KeyMap -> KeyMap
-addBinding key action map = addBinding_ key (Left action) map
+addBinding :: forall a. KeyBinding -> KeyAction a -> KeyMap a -> KeyMap a
+addBinding key action map = addBinding_ key action map
 
-addMappedBinding :: KeyBinding -> KeyBinding -> KeyMap -> KeyMap
-addMappedBinding key ref map = addBinding_ key (Right ref) map
-
-addKeyBindingAction :: KeyBindingAction -> KeyMap -> KeyMap
+addKeyBindingAction :: forall a. KeyBindingAction a -> KeyMap a -> KeyMap a
 addKeyBindingAction (KeyBindingAction { key, action }) map = addBinding_ key action map
 
-addBinding_ :: KeyBinding -> Either KeyAction KeyBinding -> KeyMap -> KeyMap
+addBinding_ :: forall a. KeyBinding -> KeyAction a -> KeyMap a -> KeyMap a
 addBinding_ key@(KeyBinding keyS) action (KeyMap { bindings, actions }) =
   let bindings' = bindings `snoc` (KeyBindingAction { key, action })
       actions' = StrMap.insert keyS action actions
   in KeyMap { bindings: bindings', actions: actions' }
 
-getAction :: KeyBinding -> KeyMap -> Maybe KeyAction
+getAction :: forall a. KeyBinding -> KeyMap a -> Maybe (KeyAction a)
 getAction key@(KeyBinding keyS) km@(KeyMap { actions }) =
   let lookup = StrMap.lookup keyS actions
-  in case lookup of
-    Just (Left action) -> Just action
-    Just (Right ref) -> getAction ref km
-    _ -> Nothing
+  in lookup
 
-getBindings :: KeyMap -> Array KeyBindingAction
+getBindings :: forall a. KeyMap a -> Array (KeyBindingAction a)
 getBindings (KeyMap { bindings }) = bindings
 
-makeAction :: Action -> String -> KeyAction
+makeAction :: forall a. a -> String -> KeyAction a
 makeAction action description = KeyAction { action, description }
 
-bindToAction :: String -> KeyAction -> KeyBindingAction
-bindToAction key action = KeyBindingAction { key: KeyBinding key, action: Left action }
+bindToAction :: forall a. String -> KeyAction a -> KeyBindingAction a
+bindToAction key action = KeyBindingAction { key: KeyBinding key, action }

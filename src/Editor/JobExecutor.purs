@@ -12,7 +12,7 @@ import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Class (liftEff)
 import Control.Monad.Eff.Unsafe (unsafeCoerceEff)
 import Editor.JobQueue (Job)
-import Editor.Transformers (Action)
+import Editor.State (Action)
 import Prelude (Unit, bind, discard, ($), (<>))
 
 data ExecutorState = ExecutorState TasksConfig InQueue OutQueue

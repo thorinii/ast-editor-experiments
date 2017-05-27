@@ -3,10 +3,10 @@ module Editor.DefaultKeyBindings (
 ) where
 
 import Editor.KeyMap (KeyBindingAction, bindToAction, makeAction)
-import Editor.Transformers (Action(..), AstAction(..))
+import Editor.State (Action(..), AstAction(..))
 import Prelude (negate, ($))
 
-bindings :: Array KeyBindingAction
+bindings :: Array (KeyBindingAction Action)
 bindings = [
   bindToAction "<space>" $
     makeAction (AstAction ApplySelected)

@@ -25,13 +25,13 @@ import Editor.StateContainer (StateContainer)
 import Model.Ast (Expr)
 import Prelude (Unit, bind, discard, pure, unit, ($))
 
-data Editor = Editor (StateContainer EditorState Transformers.Action)
-                     KeyMap
+data Editor = Editor (StateContainer EditorState State.Action)
+                     (KeyMap State.Action)
                      JobExecutor
                      (Maybe Listener)
                      (Ref (Event -> Eff (ref :: REF) Unit)) -- TODO: make this a Signal
                      (AVar Job)
-                     (AVar Transformers.Action)
+                     (AVar State.Action)
 
 data Event = ImportAstEvent Expr
            | KeyEvent KeyMap.KeyBinding
@@ -66,7 +66,7 @@ setListener listener (Editor s k e _ dispatchRef eq aq) = do
 getState :: forall e. Editor -> Eff (ref :: REF | e) EditorState
 getState (Editor s _ _ _ _ _ _) = StateContainer.get s
 
-getKeyMap :: Editor -> KeyMap
+getKeyMap :: Editor -> KeyMap State.Action
 getKeyMap (Editor _ k _ _ _ _ _) = k
 
 showAst :: forall e. Expr -> Editor -> Eff (ref :: REF | e) Unit
@@ -89,7 +89,7 @@ processEvent ev ed@(Editor sc keyMap _ _ _ _ _) = do
   state <- getState ed
   case ev of
     ImportAstEvent ast ->
-      StateContainer.apply (Transformers.ImportAstAction "main" ast) sc
+      StateContainer.apply (State.ImportAstAction "main" ast) sc
     KeyEvent key ->
       let actionM = KeyMap.getAction key keyMap
       in maybe (pure unit)
@@ -98,14 +98,14 @@ processEvent ev ed@(Editor sc keyMap _ _ _ _ _) = do
     JobUpdateEvent ->
       pure unit
     UpdateCacheEvent target key value ->
-      StateContainer.apply (Transformers.UpdateCache target key value) sc
+      StateContainer.apply (State.UpdateCache target key value) sc
 
 processJobWatchers :: forall e. Editor -> Eff (ref :: REF | e) Unit
 processJobWatchers ed@(Editor sc _ executor _ _ _ _) = do
   state <- getState ed
   let queue = State.jobQueue state
   queue' <- _processJobWatchers state queue executor
-  StateContainer.apply (Transformers.UpdateJobQueue queue') sc
+  StateContainer.apply (State.UpdateJobQueue queue') sc
 
 
 processJobQueue :: forall e. Editor -> Eff (ref :: REF | e) Unit
@@ -113,7 +113,7 @@ processJobQueue ed@(Editor sc _ executor _ _ _ _) = do
   state <- getState ed
   let queue = State.jobQueue state
   queue' <- _processJobQueue state queue executor
-  StateContainer.apply (Transformers.UpdateJobQueue queue') sc
+  StateContainer.apply (State.UpdateJobQueue queue') sc
 
 callListener :: forall e. Editor -> Eff (ref :: REF | e) Unit
 callListener (Editor _ _ _ listenerM _ _ _) = case listenerM of
@@ -123,7 +123,7 @@ callListener (Editor _ _ _ listenerM _ _ _) = case listenerM of
 foreign import _createJobExecutor :: forall e. Event -> (String -> String -> State.JobResult -> Event) -> Ref (Event -> Eff (ref :: REF) Unit) -> Eff (ref :: REF | e) JobExecutor
 foreign import _installCompileTask :: forall e. JobExecutor -> Eff (ref :: REF | e) Unit
 foreign import _installTestTask :: forall e. JobExecutor -> Eff (ref :: REF | e) Unit
-foreign import _installKeyBindings :: KeyMap -> KeyMap
+foreign import _installKeyBindings :: KeyMap State.Action -> KeyMap State.Action
 
 foreign import _processJobWatchers :: forall e. EditorState -> JobQueue -> JobExecutor -> Eff e JobQueue
 foreign import _processJobQueue :: forall e. EditorState -> JobQueue -> JobExecutor -> Eff e JobQueue

@@ -1,5 +1,4 @@
 module Editor.Transformers (
-  Action(..), AstAction(..),
   reducer
 ) where
 
@@ -8,8 +7,7 @@ import Editor.JobQueue as JobQueue
 import Model.Ast.Operators as Ops
 import Model.Cursor as Cursor
 import Data.Maybe (Maybe(..), maybe)
-import Editor.JobQueue (JobQueue, Job)
-import Editor.State (EditorState(..), EditorCursor(..), JobResult)
+import Editor.State (Action(..), AstAction(..), EditorCursor(..), EditorState(..))
 import Model.Ast (Expr)
 import Model.Cursor (Cursor)
 import Prelude (id, ($), (<<<), (>>=))
@@ -44,15 +42,3 @@ astReducer action cursor expr = case action of
   ApplyWithSelected -> Ops.wrapApplyTo cursor expr
   WrapInLet -> Ops.wrapInLet cursor expr
   ReplaceWithLambda -> Ops.replaceWithLambda cursor expr
-
-data Action = ImportAstAction String Expr
-            | AstAction AstAction
-            | CursorAction Int
-            | EnqueueJobAction Job
-            | UpdateJobQueue JobQueue
-            | UpdateCache String String JobResult
-
-data AstAction = ApplySelected
-               | ApplyWithSelected
-               | WrapInLet
-               | ReplaceWithLambda
