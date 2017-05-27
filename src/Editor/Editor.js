@@ -1,6 +1,6 @@
 var JobExecutor = require('../core/job-executor')
 var KeyMap = require('./KeyMap')
-var DefaultKeyMapConfig = require('../core/default-keymap-config')
+var DefaultKeyMapConfig = require('./DefaultKeyBindings')
 var CompileTask = require('../core/task-compile')
 var TestTask = require('../core/task-test')
 
@@ -38,11 +38,7 @@ exports._installTestTask = function (jobExecutor) {
 
 exports._installKeyBindings = function (keyMap) {
   return DefaultKeyMapConfig.bindings.reduce(function (acc, binding) {
-    if (binding.action) {
-      return KeyMap.addBinding(binding.key)(binding.action)(acc)
-    } else {
-      return KeyMap.addMappedBinding(binding.key)(binding.ref)(acc)
-    }
+    return KeyMap.addKeyBindingAction(binding)(acc)
   }, keyMap)
 }
 

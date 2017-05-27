@@ -2,9 +2,10 @@ module Editor.KeyMap (
   KeyMap, KeyBinding, KeyAction(..), KeyBindingAction,
   empty,
   isPassthrough,
-  addBinding, addMappedBinding,
+  addBinding, addMappedBinding, addKeyBindingAction,
   getAction,
-  getBindings
+  getBindings,
+  makeAction, bindToAction
 ) where
 
 import Data.StrMap as StrMap
@@ -44,6 +45,9 @@ addBinding key action map = addBinding_ key (Left action) map
 addMappedBinding :: KeyBinding -> KeyBinding -> KeyMap -> KeyMap
 addMappedBinding key ref map = addBinding_ key (Right ref) map
 
+addKeyBindingAction :: KeyBindingAction -> KeyMap -> KeyMap
+addKeyBindingAction (KeyBindingAction { key, action }) map = addBinding_ key action map
+
 addBinding_ :: KeyBinding -> Either KeyAction KeyBinding -> KeyMap -> KeyMap
 addBinding_ key@(KeyBinding keyS) action (KeyMap { bindings, actions }) =
   let bindings' = bindings `snoc` (KeyBindingAction { key, action })
@@ -60,3 +64,9 @@ getAction key@(KeyBinding keyS) km@(KeyMap { actions }) =
 
 getBindings :: KeyMap -> Array KeyBindingAction
 getBindings (KeyMap { bindings }) = bindings
+
+makeAction :: Action -> String -> KeyAction
+makeAction action description = KeyAction { action, description }
+
+bindToAction :: String -> KeyAction -> KeyBindingAction
+bindToAction key action = KeyBindingAction { key: KeyBinding key, action: Left action }

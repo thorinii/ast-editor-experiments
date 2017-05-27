@@ -50,7 +50,7 @@ There is no usage yet.
 ## TODO
 
 * Begin rewriting in Purescript <--- very important for code sanity
-  * default-keymap-config
+  * TODO: move KeyMap to EditorState
   * Job Executor
     * A thing that receives tasks via an AVar and runs an Aff asynchronously
   * task-compile
