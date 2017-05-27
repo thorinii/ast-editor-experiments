@@ -86,6 +86,7 @@ There is no usage yet.
   * Apply
   * Remove 'let' replace with 'let+' renamed
 * Database/serialisation
+  * Use the dev-server as a proxy infront of the Node server
   * Websocket to the NodeJS server
   * Use LevelDB (https://github.com/Level/level) with encoding=json
   * https://webpack.js.org/guides/get-started/

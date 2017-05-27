@@ -1,15 +1,9 @@
-const passthrough = [
-  'ctrl + r', 'ctrl + shift + r',
-  'f5', 'ctrl + f5',
-  'ctrl + shift + i',
-  'f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'f10', 'f11', 'f12'
-]
+import KM from '../Editor/KeyMap'
 
-const isPassthrough = function (key) { return passthrough.indexOf(key) !== -1 }
+const isPassthrough = KM.isPassthrough
 
 function KeyMap () {
-  this._bindings = []
-  this._actions = {}
+  this._km = KM.empty
 }
 
 KeyMap.prototype.addBindings = function (bindings) {
@@ -17,18 +11,26 @@ KeyMap.prototype.addBindings = function (bindings) {
 }
 
 KeyMap.prototype.addBinding = function (binding) {
-  this._bindings.push(binding)
-  this._actions[binding.key] = binding.action ? binding.action.action : binding.ref
+  if (binding.action) {
+    this._km = KM.addBinding(binding.key)(binding.action)(this._km)
+  } else {
+    this._km = KM.addMappedBinding(binding.key)(binding.ref)(this._km)
+  }
 }
 
 KeyMap.prototype.isPassthrough = isPassthrough
 
 KeyMap.prototype.getAction = function (key) {
-  const action = this._actions[key]
-  return (typeof action === 'string') ? this.getAction(action) : action
+  const actionM = KM.getAction(key)(this._km)
+  if (actionM.value0) {
+    return actionM.value0.action
+  } else {
+    return null
+  }
 }
 
-KeyMap.prototype.getBindings = function () { return this._bindings }
-KeyMap.prototype.getActions = function () { return this._actions }
+KeyMap.prototype.getBindings = function () {
+  return KM.getBindings(this._km)
+}
 
 module.exports = KeyMap

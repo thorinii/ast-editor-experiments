@@ -8,15 +8,15 @@ module.exports = {
     const keyMap = props.keyMap
 
     const bindings = keyMap.getBindings().map(binding => {
-      if (binding.action) {
+      if (binding.action.constructor.name === 'Left') {
         return e('li', {className: 'binding'},
           e('key', {}, binding.key),
-          binding.action.description)
+          binding.action.value0.description)
       } else {
         return e('li', {className: 'binding'},
           e('key', {}, binding.key),
           ' -> ',
-          e('key', {}, binding.ref))
+          e('key', {}, binding.action.value0.ref))
       }
     })
 
