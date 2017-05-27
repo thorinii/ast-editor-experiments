@@ -1,5 +1,6 @@
 import React from 'react'
 import Components from '../UI/Components.purs'
+import KeyMap from '../Editor/KeyMap'
 
 const e = React.createElement
 
@@ -7,7 +8,7 @@ module.exports = {
   render: function (props) {
     const keyMap = props.keyMap
 
-    const bindings = keyMap.getBindings().map(binding => {
+    const bindings = KeyMap.getBindings(keyMap).map(binding => {
       if (binding.action.constructor.name === 'Left') {
         return e('li', {className: 'binding'},
           e('key', {}, binding.key),

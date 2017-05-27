@@ -1,6 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import EditorRender from './editor-render'
+import KeyMap from '../Editor/KeyMap'
 
 const translateKeyEvent = ev => {
   const KE = window.KeyboardEvent
@@ -66,7 +67,7 @@ EditorUI.prototype._render = function () {
       const translatedEvent = translateKeyEvent(ev)
       const key = translatedEvent.string
 
-      if (!this._editor.getKeyMap().isPassthrough(key)) {
+      if (!KeyMap.isPassthrough(key)) {
         this._editor.dispatchKey(key)
         ev.preventDefault()
       }

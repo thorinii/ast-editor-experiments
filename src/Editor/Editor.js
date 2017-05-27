@@ -1,11 +1,8 @@
-var KeyMap = require('../core/keymap')
 var JobExecutor = require('../core/job-executor')
+var KeyMap = require('./KeyMap')
 var DefaultKeyMapConfig = require('../core/default-keymap-config')
 var CompileTask = require('../core/task-compile')
 var TestTask = require('../core/task-test')
-var Maybe = require('../../bower_components/purescript-maybe/src/Data/Maybe')
-
-exports._makeKeyMap = new KeyMap()
 
 exports._createJobExecutor = function (JobUpdateEvent) {
   return function (UpdateCacheEvent) {
@@ -40,8 +37,13 @@ exports._installTestTask = function (jobExecutor) {
 }
 
 exports._installKeyBindings = function (keyMap) {
-  keyMap.addBindings(DefaultKeyMapConfig.bindings)
-  return keyMap
+  return DefaultKeyMapConfig.bindings.reduce(function (acc, binding) {
+    if (binding.action) {
+      return KeyMap.addBinding(binding.key)(binding.action)(acc)
+    } else {
+      return KeyMap.addMappedBinding(binding.key)(binding.ref)(acc)
+    }
+  }, keyMap)
 }
 
 exports._processJobWatchers = function (state) {
@@ -60,17 +62,6 @@ exports._processJobQueue = function (state) {
       return function () {
         return executor.process(state, queue)
       }
-    }
-  }
-}
-
-exports._getAction = function (key) {
-  return function (keyMap) {
-    const action = keyMap.getAction(key)
-    if (action !== undefined) {
-      return Maybe.Just.create(action)
-    } else {
-      return Maybe.Nothing.value
     }
   }
 }

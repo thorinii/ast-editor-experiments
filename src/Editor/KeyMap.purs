@@ -1,5 +1,5 @@
 module Editor.KeyMap (
-  KeyMap, KeyBinding, KeyAction, KeyBindingAction,
+  KeyMap, KeyBinding, KeyAction(..), KeyBindingAction,
   empty,
   isPassthrough,
   addBinding, addMappedBinding,
