@@ -1,7 +1,15 @@
 import _Editor from '../Editor/Editor.purs'
 
-function Editor () {
-  this._e = _Editor.create()
+const createEditor = function (callback) {
+  _Editor.create(function (e) {
+    callback(null, new Editor(e))
+  }, function (error) {
+    callback(error)
+  })
+}
+
+function Editor (e) {
+  this._e = e
 }
 
 Editor.prototype.setListener = function (listener) {
@@ -21,4 +29,4 @@ Editor.prototype.dispatchKey = function (key) {
   _Editor.dispatchKey(key)(this._e)()
 }
 
-module.exports = Editor
+module.exports.createEditor = createEditor

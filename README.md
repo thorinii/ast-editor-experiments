@@ -53,12 +53,12 @@ There is no usage yet.
   * keymap
   * default-keymap-config
   * Job Executor
+    * A thing that receives tasks via an AVar and runs an Aff asynchronously
   * task-compile
   * task-test
-  * Use a signal to trigger the event loop
+  * Use an AVar to trigger the event loop
     * Event loop has type `StateT EditorState Eff a`
-    * Outer signaller uses purescript-signal channels to publish events
-      * foldP (\ev state -> runStateM state (... ev))
+    * Outer loop is an Aff that listens to an AVar
     * State changers tend to have `forall m a. MonadState EditorState m => m a`.
   * most things in state should be hashable
   * Split Jobs and cached functions; cache should be separate to state

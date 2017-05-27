@@ -1,4 +1,5 @@
 import JobQueue from '../Editor/JobQueue'
+import JE from '../Editor/JobExecutor'
 
 function JobExecutor (callback, updateCache) {
   this._callback = callback
