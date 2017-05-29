@@ -46,14 +46,12 @@ function EditorUI (editor, el) {
   this._editor = editor
   this._el = el
 
-  this._editor.setListener(() => this._render())
-  this._render()
+  this._editor.setListener(state => this._render(state))
 }
 
-EditorUI.prototype._render = function () {
+EditorUI.prototype._render = function (state) {
   const el = this._el
-  const state = this._editor.getState()
-  const keyMap = this._editor.getKeyMap()
+  const keyMap = state.keyMap
 
   ReactDOM.render(
     React.createElement(EditorRender.editor, {

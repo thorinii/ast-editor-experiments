@@ -24,6 +24,9 @@ type TasksConfig = {}
 type InQueue = AVar Job
 type OutQueue = AVar Action
 
+data Task result
+-- data TasksConfig job result = TasksConfig (job -> (Task result))
+
 start :: forall e. ExecutorState -> Eff (avar :: AVAR | e) Unit
 start es = Threading.startThread $ loop es
 

@@ -13,13 +13,7 @@ function Editor (e) {
 }
 
 Editor.prototype.setListener = function (listener) {
-  this._e = _Editor.setListener(listener)(this._e)()
-}
-Editor.prototype.getState = function () {
-  return _Editor.getState(this._e)()
-}
-Editor.prototype.getKeyMap = function () {
-  return _Editor.getKeyMap(this._e)()
+  _Editor.setListener(listener)(this._e)()
 }
 
 Editor.prototype.showAst = function (ast) {

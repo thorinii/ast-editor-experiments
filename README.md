@@ -45,30 +45,55 @@ There is no usage yet.
   * Enter expressions (literals, variables, lambdas, applies, binaries, lets, and patterns)
   * Modify expressions
   * Evaluate on the fly and render the result
-
+2. A flat, no-hierarchy multiple-toplevel editor
+  * Named top-levels
+  * Eval top-levels
+  * Saving/reloading
+3. Usability
+  * Autocomplete
+  * Refactoring
+  * The awesome popup picker
+  * Anything else that smooths usage
+4. Types
+  * ...
+5. Import simple Purescript code
 
 ## TODO
 
-* Begin rewriting in Purescript <--- very important for code sanity
-  * Job Executor
-    * A thing that receives tasks via an AVar and runs an Aff asynchronously
-  * task-compile
-  * task-test
+* Completely rewrite Job system
+  * Currently our expression context is an Eval toplevel (for now)
+  * On-change (by hash), compile and execute
+    * ```
+        onChange expr = do
+          compiled <- compile
+          result <- execute compiled
+          display result
+      ```
+    * On-change will need a dependency graph
+  * Compile will be cached (by hash)
+    * Cache nowhere near the State
+    * Private cache?
+  * Job system works over things like Eval and Test etc
+    * eg `Evaluating astar simple (1 test, 13 evals)`
+    * eg `Testing main (3 tests)`
+    * `Error evaluating astar simple`
+    * `Type Error testing main`
+    * `Error testing main`
+
+  * ... reevaluate all below:
+
+  * Job Queue - agnostic to Job type
+    * JobQueue job
+    * Jobs should have a Show to be reportable
+  * Job Executor - runs Jobs from the in queue and sends result to out queue
+    * forall job result. JobExecutor job result
+    * Given a function that turns Jobs into Tasks
+* Rename EditorState to State
+* Rewrite in Purescript
   * Use an AVar to trigger the event loop
     * Event loop has type `StateT EditorState Eff a`
     * Outer loop is an Aff that listens to an AVar
     * State changers tend to have `forall m a. MonadState EditorState m => m a`.
-  * most things in state should be hashable
-  * Split Jobs and cached functions; cache should be separate to state
-    * Jobs shouldn't care about sources and targets
-      * They are `Aff (...) Transformers.Action` with Exceptions
-    * compile task is as if a constantly run function
-      * code[key] -> compiled[key]
-    * test task the same
-      * compiled[key] -> testResults[key]
-    * cached by the infrastructure with hashes
-    * job queue works behind the scenes
-  * Where should JobExecutor and KeyMap etc state go?
   * selectors
   * keymap-chart
   * editor-render
