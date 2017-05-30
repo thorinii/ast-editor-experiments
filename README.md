@@ -60,6 +60,11 @@ There is no usage yet.
 
 ## TODO
 
+* Split Events and Actions
+  * Use an Action loop for the main processing
+  * Use a Input Events for the UI
+    * Get translated into Actions
+  * Jobs result in Actions
 * Completely rewrite Job system
   * Currently our expression context is an Eval toplevel (for now)
   * On-change (by hash), compile and execute
@@ -79,9 +84,6 @@ There is no usage yet.
     * `Error evaluating astar simple`
     * `Type Error testing main`
     * `Error testing main`
-
-  * ... reevaluate all below:
-
   * Job Queue - agnostic to Job type
     * JobQueue job
     * Jobs should have a Show to be reportable
@@ -89,25 +91,23 @@ There is no usage yet.
     * forall job result. JobExecutor job result
     * Given a function that turns Jobs into Tasks
 * Rename EditorState to State
-* Rewrite in Purescript
-  * Use an AVar to trigger the event loop
-    * Event loop has type `StateT EditorState Eff a`
-    * Outer loop is an Aff that listens to an AVar
-    * State changers tend to have `forall m a. MonadState EditorState m => m a`.
-  * selectors
-  * keymap-chart
-  * editor-render
-  * editor-ui
 * Implement more commands
   * Implement literal entry/variable picker asap aka the autocomplete popup
   * All expression types
     * Add an autocomplete popup with <key>c</key>
       * For literals, variables
       * let 'let', lambda '\', pattern 'case'
+* Refactor into Utils, Model, State, Event Loop, Jobs, main, etc
+* Use an exhaustive search of things to Eval (but use diff to shortcut)
 * More rolling up of nested things (in the core AST as well)
   * Lambda
   * Apply
   * Remove 'let' replace with 'let+' renamed
+* Rewrite in Purescript
+  * selectors
+  * keymap-chart
+  * editor-render
+  * editor-ui
 * Database/serialisation
   * Use the dev-server as a proxy infront of the Node server
   * Websocket to the NodeJS server

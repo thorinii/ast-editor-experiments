@@ -11,9 +11,9 @@ import Control.Monad.Aff.AVar (AVAR, AVar)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Class (liftEff)
 import Control.Monad.Eff.Unsafe (unsafeCoerceEff)
-import Editor.JobQueue (Job)
+import Editor.Job (Job)
 import Editor.State (Action)
-import Prelude (Unit, bind, discard, ($), (<>))
+import Prelude (Unit, bind, discard, show, ($), (<>))
 
 data ExecutorState = ExecutorState TasksConfig InQueue OutQueue
 
@@ -32,9 +32,8 @@ start es = Threading.startThread $ loop es
 
 loop :: forall e. ExecutorState -> Aff (avar :: AVAR | e) Unit
 loop es@(ExecutorState config inQueue outQueue) = do
-  liftEff $ log "waiting for a job..."
   job <- Threading.takeQueue inQueue
-  liftEff $ log $ "got a job: " <> job.type
+  liftEff $ log $ "got a job: " <> show job
   loop es
 
 log :: forall e. String -> Eff e Unit

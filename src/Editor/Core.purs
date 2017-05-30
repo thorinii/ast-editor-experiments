@@ -8,7 +8,6 @@ module Editor.Core (
 import Editor.State
 import Data.StrMap as Map
 import Editor.DefaultKeyBindings as DKB
-import Editor.JobQueue as JobQueue
 import Editor.KeyMap as KeyMap
 import Model.Ast as Ast
 import Model.Ast.Operators as Ops
@@ -32,7 +31,6 @@ initialState :: EditorState
 initialState = EditorState {
   code: Map.insert "main" Ast.Hole Map.empty,
   cursor: EditorCursor "main" Nothing,
-  jobQueue: JobQueue.empty,
   cache: Map.empty,
   keyMap: foldl (flip KeyMap.addKeyBindingAction) KeyMap.empty DKB.bindings
 }
@@ -58,9 +56,6 @@ reducer action (EditorState state) = case action of
         ast = Map.lookup name state.code
         path' = ast `bind` (\ast' -> Cursor.nextAdjacentLeaf ast' path direction)
     in pure $ EditorState $ state { cursor = EditorCursor name path' }
-
-  EnqueueJobAction job -> pure $ EditorState $ state { jobQueue = JobQueue.enqueue job state.jobQueue }
-  UpdateJobQueue queue -> pure $ EditorState $ state { jobQueue = queue }
 
   UpdateCache target key value ->
     let cacheTarget = maybe Map.empty id $ Map.lookup target state.cache

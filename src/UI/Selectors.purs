@@ -49,28 +49,25 @@ newtype StatusLine = StatusLine {
 
 status :: EditorState -> StatusLine
 status state = StatusLine { level: level, message: message }
-  where jobsS = jobsMessage (State.jobQueue state)
-        failed = (State.cache >>> failedCompiles) state <>
+  where failed = (State.cache >>> failedCompiles) state <>
                  (State.cache >>> failedTests) state
         message = joinWith "\n" $ map (\(Tuple _ m) -> m) messages
         level = foldl (<>) StatusInfo $ map (\(Tuple l _) -> l) messages
-        messages =
-          [Tuple StatusInfo jobsS] <>
-          failed
+        messages = [Tuple StatusInfo "Idle" ] <> failed
 
 
-jobsMessage :: JobQueue -> String
-jobsMessage queue =
-  let { running, waiting } = jobs queue
-      runningS = if null waiting then ["Idle"] else [joinWith ", " running]
-      waitingS = if null waiting then [] else ["(" <> joinWith ", " waiting <> ")"]
-      combined = runningS <> waitingS
-  in joinWith " " combined
-
-jobs :: JobQueue -> { running :: Array String, waiting :: Array String }
-jobs queue = { running: running, waiting: waiting }
-  where running = (JobQueue.allRunning >>> map (\j -> j.type)) queue
-        waiting = (JobQueue.allQueued >>> map (\j -> j.type)) queue
+-- jobsMessage :: JobQueue -> String
+-- jobsMessage queue =
+--   let { running, waiting } = jobs queue
+--       runningS = if null waiting then ["Idle"] else [joinWith ", " running]
+--       waitingS = if null waiting then [] else ["(" <> joinWith ", " waiting <> ")"]
+--       combined = runningS <> waitingS
+--   in joinWith " " combined
+--
+-- jobs :: JobQueue -> { running :: Array String, waiting :: Array String }
+-- jobs queue = { running: running, waiting: waiting }
+--   where running = (JobQueue.allRunning >>> map (\j -> j.type)) queue
+--         waiting = (JobQueue.allQueued >>> map (\j -> j.type)) queue
 
 failedCompiles :: StrMap (StrMap State.JobResult) -> Array (Tuple StatusLevel String)
 failedCompiles cache = maybe [] f $ StrMap.lookup "compiled" cache

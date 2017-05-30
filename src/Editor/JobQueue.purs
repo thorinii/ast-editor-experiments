@@ -1,5 +1,5 @@
 module Editor.JobQueue (
-  JobQueue, Job,
+  JobQueue,
   empty,
   isEmpty, isIdle,
   allQueued, allRunning,

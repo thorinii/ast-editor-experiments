@@ -20,17 +20,20 @@ import Control.Monad.Eff.Console (CONSOLE)
 import Control.Monad.Eff.Ref (REF)
 import Control.Monad.State (StateT, get, lift, modify, put, runStateT)
 import Control.Monad.Writer (WriterT, execWriterT)
+import Data.Array (concatMap)
 import Data.Maybe (Maybe(..), maybe)
+import Data.Traversable (for_)
 import Editor.Event (Event(..))
-import Editor.JobQueue (Job)
+import Editor.Job (Job(..))
 import Editor.Listener (Listener)
 import Model.Ast (Expr)
-import Prelude (Unit, bind, discard, pure, show, unit, ($), (<>))
+import Prelude (Unit, bind, discard, map, pure, show, unit, ($), (<>))
 
 data Editor = Editor (AVar Job) (AVar Event)
 
 type EditorState = {
   eventQueue :: AVar Event,
+  executorQueue :: AVar Job,
   state :: State.EditorState,
   listener :: Maybe Listener
 }
@@ -43,7 +46,7 @@ create = do
   actionQueue <- Threading.createQueue
   eventQueue <- Threading.createQueue
   liftEff $ start {
-    eventQueue,
+    eventQueue, executorQueue,
     state: Core.initialState,
     listener: Nothing
   }
@@ -72,11 +75,13 @@ start state@{ listener, state: state' } = Threading.startThread $ do
 
 loop :: forall e. EditorM e Unit
 loop = do
-  { eventQueue } <- get
+  { eventQueue, executorQueue } <- get
   event <- lift $ Threading.takeQueue eventQueue
   diff <- execWriterT $ handleEvent event
-  lift $ log $ "Processed event; diff: " <> show diff
   { listener, state } <- get
+  let jobs = map (\(Core.Diff name) -> (EvalJob name) `map` (State.lookupEvalExpr name state)) diff
+      jobs' = concatMap (maybe [] (\j -> [j])) jobs
+  lift $ for_ jobs' (Threading.putQueue executorQueue)
   liftEff $ Listener.callListener listener state
   loop
 
