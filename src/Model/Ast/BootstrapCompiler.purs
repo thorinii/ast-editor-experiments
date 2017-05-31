@@ -1,7 +1,8 @@
-module Model.Ast.BootstrapCompiler (translate) where
+module Model.Ast.BootstrapCompiler (translate, eval) where
 
 import Model.Ast
 import Data.Foldable (foldl, foldr)
+import Data.Maybe (Maybe)
 import Data.String (joinWith)
 import Prelude (map, show, ($), (<>), (==))
 
@@ -49,3 +50,9 @@ translateP ast = case ast of
 stringify :: LiteralValue -> String
 stringify (LiteralNumber n) = show n
 stringify (LiteralString s) = "\"" <> s <> "\""
+
+
+eval :: String -> Maybe String
+eval = _eval
+
+foreign import _eval :: String -> Maybe String

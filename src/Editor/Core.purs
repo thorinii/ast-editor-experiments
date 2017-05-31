@@ -31,6 +31,7 @@ initialState :: EditorState
 initialState = EditorState {
   code: Map.insert "main" Ast.Hole Map.empty,
   cursor: EditorCursor "main" Nothing,
+  evalResults: Map.empty,
   cache: Map.empty,
   keyMap: foldl (flip KeyMap.addKeyBindingAction) KeyMap.empty DKB.bindings
 }
@@ -57,10 +58,10 @@ reducer action (EditorState state) = case action of
         path' = ast `bind` (\ast' -> Cursor.nextAdjacentLeaf ast' path direction)
     in pure $ EditorState $ state { cursor = EditorCursor name path' }
 
-  UpdateCache target key value ->
-    let cacheTarget = maybe Map.empty id $ Map.lookup target state.cache
-        cacheTarget' = Map.insert key value cacheTarget
-    in pure $ EditorState $ state { cache = Map.insert target cacheTarget' state.cache}
+  UpdateEvalResult key result ->
+    let evalResults = state.evalResults
+        evalResults' = Map.insert key result evalResults
+    in pure $ EditorState $ state { evalResults = evalResults' }
 
 astReducer :: AstAction -> Cursor -> Ast.Expr -> Ast.Expr
 astReducer action cursor expr = case action of

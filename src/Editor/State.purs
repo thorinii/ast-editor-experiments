@@ -18,6 +18,7 @@ data EditorCursor = EditorCursor String (Maybe Cursor)
 newtype EditorState = EditorState {
   code :: StrMap Expr,
   cursor :: EditorCursor,
+  evalResults :: StrMap (Maybe String),
   cache :: StrMap (StrMap JobResult),
   keyMap :: KeyMap Action
 }
@@ -31,7 +32,7 @@ newtype JobResult = JobResult {
 data Action = ImportAstAction String Expr
             | AstAction AstAction
             | CursorAction Int
-            | UpdateCache String String JobResult
+            | UpdateEvalResult String (Maybe String)
 
 data AstAction = ApplySelected
                | ApplyWithSelected

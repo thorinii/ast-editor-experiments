@@ -60,11 +60,38 @@ There is no usage yet.
 
 ## TODO
 
+* Rename EditorState to State
+* Implement more commands
+  * Implement literal entry/variable picker asap aka the autocomplete popup
+  * All expression types
+    * Add an autocomplete popup with <key>c</key>
+      * For literals, variables
+      * let 'let', lambda '\', pattern 'case'
 * Split Events and Actions
   * Use an Action loop for the main processing
   * Use a Input Events for the UI
     * Get translated into Actions
   * Jobs result in Actions
+* Refactor into Utils, Model, State, Event Loop, Jobs, main, etc
+* Use an exhaustive search of things to Eval (but use diff to shortcut)
+* More folding up of nested things (in the core AST as well)
+  * Don't fold up in bottom-most AST
+  * Fold up in renderer (and compiler if needed)
+  * Cursor will have to be rewritten in the folder
+* Rewrite in Purescript
+  * selectors
+  * keymap-chart
+  * editor-render
+  * editor-ui
+* Database/serialisation
+  * Use the dev-server as a proxy infront of the Node server
+  * Websocket to the NodeJS server
+  * Use LevelDB (https://github.com/Level/level) with encoding=json
+  * https://webpack.js.org/guides/get-started/
+  * https://webpack.js.org/guides/development/#webpack-dev-middleware
+  * http://www.pauleveritt.org/articles/pylyglot/webpack/
+  * http://jamesknelson.com/using-es6-in-the-browser-with-babel-6-and-webpack/
+  * Offload compilation and testing
 * Completely rewrite Job system
   * Currently our expression context is an Eval toplevel (for now)
   * On-change (by hash), compile and execute
@@ -90,33 +117,6 @@ There is no usage yet.
   * Job Executor - runs Jobs from the in queue and sends result to out queue
     * forall job result. JobExecutor job result
     * Given a function that turns Jobs into Tasks
-* Rename EditorState to State
-* Implement more commands
-  * Implement literal entry/variable picker asap aka the autocomplete popup
-  * All expression types
-    * Add an autocomplete popup with <key>c</key>
-      * For literals, variables
-      * let 'let', lambda '\', pattern 'case'
-* Refactor into Utils, Model, State, Event Loop, Jobs, main, etc
-* Use an exhaustive search of things to Eval (but use diff to shortcut)
-* More rolling up of nested things (in the core AST as well)
-  * Lambda
-  * Apply
-  * Remove 'let' replace with 'let+' renamed
-* Rewrite in Purescript
-  * selectors
-  * keymap-chart
-  * editor-render
-  * editor-ui
-* Database/serialisation
-  * Use the dev-server as a proxy infront of the Node server
-  * Websocket to the NodeJS server
-  * Use LevelDB (https://github.com/Level/level) with encoding=json
-  * https://webpack.js.org/guides/get-started/
-  * https://webpack.js.org/guides/development/#webpack-dev-middleware
-  * http://www.pauleveritt.org/articles/pylyglot/webpack/
-  * http://jamesknelson.com/using-es6-in-the-browser-with-babel-6-and-webpack/
-  * Offload compilation and testing
 * Implement more cursor motions
   * Hole navigation (tab)
   * Widening/shrinking

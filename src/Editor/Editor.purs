@@ -43,14 +43,13 @@ type EditorM e = StateT EditorState (Aff (avar :: AVAR, console :: CONSOLE | e))
 create :: forall e. Aff (ref :: REF, avar :: AVAR, console :: CONSOLE | e) Editor
 create = do
   executorQueue <- Threading.createQueue
-  actionQueue <- Threading.createQueue
   eventQueue <- Threading.createQueue
   liftEff $ start {
     eventQueue, executorQueue,
     state: Core.initialState,
     listener: Nothing
   }
-  liftEff $ JobExecutor.start (JobExecutor.createExecutorState {} executorQueue actionQueue)
+  liftEff $ JobExecutor.start (JobExecutor.createExecutorState {} executorQueue eventQueue)
   pure $ Editor executorQueue eventQueue
 
 
@@ -102,8 +101,6 @@ handleEvent event = do
       in maybe (pure unit)
                (\(KeyMap.KeyAction { action }) -> reduce action)
                actionM
-    JobUpdateEvent -> pure unit
-    UpdateCacheEvent target key value ->
-      reduce $ State.UpdateCache target key value
+    EvaluatedEvent key result -> reduce $ State.UpdateEvalResult key result
     SetListener listener ->
       modify (\es -> es { listener = Just listener })

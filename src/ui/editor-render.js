@@ -31,14 +31,14 @@ const CompiledJsView = props => {
 }
 
 const TestJsView = props => {
-  const result = props.testResults['main']
+  const result = props.evalResults['main']
   let render
   if (!result) {
     render = 'not tested'
-  } else if (!result.success) {
+  } else if (!result.value0) {
     render = 'failed to test'
   } else {
-    render = result.output
+    render = result.value0
   }
   return e('div', {className: 'code-text'}, render)
 }
@@ -56,7 +56,7 @@ module.exports = {
         e('div', {}, 'Go and code things')),
       e(KeyMapChart.render, {keyMap: props.keyMap}),
       Components.pane('test')('Test results')(
-        e(TestJsView, {testResults: state.cache['tested'] || {}})),
+        e(TestJsView, {evalResults: state.evalResults || {}})),
       Components.pane('compiled')('Compiled JS')(
         e(CompiledJsView, {compiled: state.cache['compiled'] || {}})))
 
