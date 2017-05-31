@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom'
 import EditorRender from './editor-render'
 import KeyMap from '../Editor/KeyMap'
 
+const uppercaseSymbols = ['~', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', '<', '>', '?', ':', '"', '{', '}', '|']
+
 const translateKeyEvent = ev => {
   const KE = window.KeyboardEvent
   const keyCodeToKey = code => {
@@ -33,7 +35,10 @@ const translateKeyEvent = ev => {
   if (ev.shiftKey) modifiers.push('shift')
   if (ev.altKey) modifiers.push('alt')
 
-  const string = modifiers.join(' + ') + (modifiers.length ? ' + ' : '') + key
+  let string = modifiers.join(' + ') + (modifiers.length ? ' + ' : '') + key
+  if (uppercaseSymbols.indexOf(key) >= 0) {
+    string = string.replace('shift + ', '')
+  }
 
   return {
     key: key,

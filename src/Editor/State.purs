@@ -37,7 +37,9 @@ data Action = ImportAstAction String Expr
 data AstAction = ApplySelected
                | ApplyWithSelected
                | WrapInLet
-               | ReplaceWithLambda
+               | WrapInLambda
+               | WrapInBinary String
+               | WrapInPattern
 
 
 code :: State -> StrMap Expr

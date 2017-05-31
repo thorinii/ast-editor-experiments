@@ -60,12 +60,22 @@ There is no usage yet.
 
 ## TODO
 
-* Implement more commands
-  * Implement literal entry/variable picker asap aka the autocomplete popup
-  * All expression types
-    * Add an autocomplete popup with <key>c</key>
-      * For literals, variables
-      * let 'let', lambda '\', pattern 'case'
+* Implement variable picker
+  * `c` for popup
+* Implement literal entry
+  * Part of the autocomplete popup
+  * `"` for strings
+  * `[0-9\.]` for numbers
+* Implement better navigation
+  * Being able to edit let binding names, lambda arg names, binary ops, pattern patterns
+  * Able to select up and down
+  * Don't ruin the cursor when rewriting
+  * Jump to holes after rewriting
+  * Add hole jumping `tab`, `shift + tab`
+* Reevaluate where we're going and work out what to polish next
+  * layout?
+  * cursor navigation through layout?
+  * move the eval result to under in a pane?
 * Split Events and Actions
   * Use an Action loop for the main processing
   * Use a Input Events for the UI
@@ -116,9 +126,6 @@ There is no usage yet.
   * Job Executor - runs Jobs from the in queue and sends result to out queue
     * forall job result. JobExecutor job result
     * Given a function that turns Jobs into Tasks
-* Implement more cursor motions
-  * Hole navigation (tab)
-  * Widening/shrinking
 * Support multiple top-levels
 * Array/object literals
 * Fix editor pane layout/wrapping etc. Either fix the flexbox or use something else.

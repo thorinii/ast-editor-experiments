@@ -1,5 +1,7 @@
 module Model.Ast.Operators (
-  wrapApplyFn, wrapApplyTo, wrapInLet, replaceWithLambda
+  wrap,
+  applyFnWrapper, applyToWrapper, letWrapper, lambdaWrapper,
+  binaryWrapper, patternWrapper
 ) where
 
 import Model.Ast
@@ -7,25 +9,48 @@ import Model.Cursor
 import Data.Array (mapWithIndex, snoc)
 import Prelude (($), (==))
 
+type Wrapper = Expr -> Expr
+
+wrap :: Wrapper -> Cursor -> Expr -> Expr
+wrap = rewriteAt
+
+
 wrapApplyFn :: Cursor -> Expr -> Expr
-wrapApplyFn = rewriteAt $ \e -> case e of
+wrapApplyFn = wrap applyFnWrapper
+
+wrapApplyTo :: Cursor -> Expr -> Expr
+wrapApplyTo = wrap applyToWrapper
+
+wrapInLet :: Cursor -> Expr -> Expr
+wrapInLet = wrap letWrapper
+
+replaceWithLambda :: Cursor -> Expr -> Expr
+replaceWithLambda = wrap lambdaWrapper
+
+
+applyFnWrapper :: Wrapper
+applyFnWrapper e = case e of
   Apply fn args -> Apply fn (args `snoc` Hole)
   _ -> Apply e [Hole]
 
-wrapApplyTo :: Cursor -> Expr -> Expr
-wrapApplyTo = rewriteAt $ \e -> Apply Hole [e]
+applyToWrapper :: Wrapper
+applyToWrapper e = Apply Hole [e]
 
-wrapInLet :: Cursor -> Expr -> Expr
-wrapInLet = rewriteAt $ \e -> Let [LetBinding "x" Hole] e
+letWrapper :: Wrapper
+letWrapper e = Let [LetBinding "x" e] (Variable "x")
 
-replaceWithLambda :: Cursor -> Expr -> Expr
-replaceWithLambda = rewriteAt $ \e -> Lambda ["x"] Hole
+lambdaWrapper :: Wrapper
+lambdaWrapper e = Lambda ["x"] e
 
+binaryWrapper :: String -> Wrapper
+binaryWrapper op e = Binary op [e, Hole]
+
+patternWrapper :: Wrapper
+patternWrapper e = Pattern Hole [PatternCase PatternAny e]
 
 
 rewriteAt :: (Expr -> Expr) -> Cursor -> Expr -> Expr
 rewriteAt f cursor = rewriteWithCursor (\c e -> if c == cursor then f e else e)
-
 
 rewriteWithCursor :: (Cursor -> Expr -> Expr) -> Expr -> Expr
 rewriteWithCursor f e = rewriteWithCursor' f emptyCursor e

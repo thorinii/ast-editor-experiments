@@ -15,6 +15,7 @@ import Model.Cursor as Cursor
 import Control.Monad.Writer (class MonadTell, tell)
 import Data.Foldable (foldl)
 import Data.Maybe (Maybe(..), maybe)
+import Model.Ast.Operators (binaryWrapper, lambdaWrapper, patternWrapper)
 import Model.Cursor (Cursor)
 import Prelude (class Show, Unit, bind, discard, flip, id, pure, ($), (<<<))
 
@@ -65,7 +66,9 @@ reducer action (State state) = case action of
 
 astReducer :: AstAction -> Cursor -> Ast.Expr -> Ast.Expr
 astReducer action cursor expr = case action of
-  ApplySelected -> Ops.wrapApplyFn cursor expr
-  ApplyWithSelected -> Ops.wrapApplyTo cursor expr
-  WrapInLet -> Ops.wrapInLet cursor expr
-  ReplaceWithLambda -> Ops.replaceWithLambda cursor expr
+  ApplySelected -> Ops.wrap Ops.applyFnWrapper cursor expr
+  ApplyWithSelected -> Ops.wrap Ops.applyToWrapper cursor expr
+  WrapInLet -> Ops.wrap Ops.letWrapper cursor expr
+  WrapInLambda -> Ops.wrap lambdaWrapper cursor expr
+  WrapInBinary op -> Ops.wrap (binaryWrapper op) cursor expr
+  WrapInPattern -> Ops.wrap patternWrapper cursor expr

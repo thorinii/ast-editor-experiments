@@ -18,8 +18,17 @@ bindings = [
     makeAction (AstAction WrapInLet)
       "Wrap the current expression in a let",
   bindToAction "\\" $
-    makeAction (AstAction ReplaceWithLambda)
-      "Replace the current expression with a lambda",
+    makeAction (AstAction WrapInLambda)
+      "Wrap the current expression in a lambda",
+  bindToAction "p" $
+    makeAction (AstAction WrapInPattern)
+      "Wrap the current expression in a pattern",
+  bindToAction "+" $
+    makeAction (AstAction (WrapInBinary "+"))
+      "Wrap the current expression in a binary +",
+  bindToAction "-" $
+    makeAction (AstAction (WrapInBinary "-"))
+      "Wrap the current expression in a binary -",
 
   bindToAction "<left>" $
     makeAction (CursorAction (-1))
