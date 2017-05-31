@@ -1,5 +1,5 @@
 module Editor.State (
-  EditorState(..), EditorCursor(..),
+  State(..), EditorCursor(..),
   Action(..), AstAction(..),
   JobResult(..),
   code, cursor, cache, keyMap,
@@ -15,7 +15,7 @@ import Model.Cursor (Cursor)
 
 data EditorCursor = EditorCursor String (Maybe Cursor)
 
-newtype EditorState = EditorState {
+newtype State = State {
   code :: StrMap Expr,
   cursor :: EditorCursor,
   evalResults :: StrMap (Maybe String),
@@ -40,17 +40,17 @@ data AstAction = ApplySelected
                | ReplaceWithLambda
 
 
-code :: EditorState -> StrMap Expr
-code (EditorState c) = c.code
+code :: State -> StrMap Expr
+code (State c) = c.code
 
-cursor :: EditorState -> EditorCursor
-cursor (EditorState c) = c.cursor
+cursor :: State -> EditorCursor
+cursor (State c) = c.cursor
 
-cache :: EditorState -> StrMap (StrMap JobResult)
-cache (EditorState c) = c.cache
+cache :: State -> StrMap (StrMap JobResult)
+cache (State c) = c.cache
 
-keyMap :: EditorState -> KeyMap Action
-keyMap (EditorState c) = c.keyMap
+keyMap :: State -> KeyMap Action
+keyMap (State c) = c.keyMap
 
-lookupEvalExpr :: String -> EditorState -> Maybe Expr
-lookupEvalExpr name (EditorState { code }) = StrMap.lookup name code
+lookupEvalExpr :: String -> State -> Maybe Expr
+lookupEvalExpr name (State { code }) = StrMap.lookup name code

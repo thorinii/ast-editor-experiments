@@ -4,14 +4,14 @@ module Editor.Listener (
 
 import Control.Monad.Eff (Eff)
 import Data.Maybe (Maybe(..))
-import Editor.State (EditorState)
+import Editor.State (State)
 import Prelude (Unit, pure, unit)
 
 foreign import data Listener :: Type
 
-callListener :: forall e. Maybe Listener -> EditorState -> Eff e Unit
+callListener :: forall e. Maybe Listener -> State -> Eff e Unit
 callListener listenerM state = case listenerM of
   Just listener -> _call listener state
   Nothing -> pure unit
 
-foreign import _call :: forall e a. Listener -> EditorState -> Eff e a
+foreign import _call :: forall e a. Listener -> State -> Eff e a

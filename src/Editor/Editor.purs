@@ -10,6 +10,7 @@ import Editor.JobExecutor as JobExecutor
 import Editor.KeyMap as KeyMap
 import Editor.Listener as Listener
 import Editor.State as State
+import Editor.State (State)
 import Editor.Threading as Threading
 import Control.Monad.Aff (Aff)
 import Control.Monad.Aff.AVar (AVAR, AVar)
@@ -34,7 +35,7 @@ data Editor = Editor (AVar Job) (AVar Event)
 type EditorState = {
   eventQueue :: AVar Event,
   executorQueue :: AVar Job,
-  state :: State.EditorState,
+  state :: State,
   listener :: Maybe Listener
 }
 type EditorM e = StateT EditorState (Aff (avar :: AVAR, console :: CONSOLE | e))

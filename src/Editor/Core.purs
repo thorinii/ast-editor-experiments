@@ -27,8 +27,8 @@ class (MonadTell (Array Diff) m) <= MonadEditor m
 instance monadEditor :: (MonadTell (Array Diff) m) => MonadEditor m
 
 
-initialState :: EditorState
-initialState = EditorState {
+initialState :: State
+initialState = State {
   code: Map.insert "main" Ast.Hole Map.empty,
   cursor: EditorCursor "main" Nothing,
   evalResults: Map.empty,
@@ -40,28 +40,28 @@ pushTopLevelDiff :: forall m. MonadEditor m => String -> m Unit
 pushTopLevelDiff name = tell $ [Diff name]
 
 
-reducer :: forall m. MonadEditor m => Action -> EditorState -> m EditorState
-reducer action (EditorState state) = case action of
+reducer :: forall m. MonadEditor m => Action -> State -> m State
+reducer action (State state) = case action of
   ImportAstAction name e -> do
     pushTopLevelDiff name
-    pure $ EditorState $ state { code = Map.insert name e state.code }
+    pure $ State $ state { code = Map.insert name e state.code }
 
   AstAction a -> do
     let (EditorCursor name path) = state.cursor
         updater = maybe Just (\path' -> Just <<< astReducer a path') path
     pushTopLevelDiff name
-    pure $ EditorState $ state { code = Map.update updater name state.code}
+    pure $ State $ state { code = Map.update updater name state.code}
 
   CursorAction direction ->
     let (EditorCursor name path) = state.cursor
         ast = Map.lookup name state.code
         path' = ast `bind` (\ast' -> Cursor.nextAdjacentLeaf ast' path direction)
-    in pure $ EditorState $ state { cursor = EditorCursor name path' }
+    in pure $ State $ state { cursor = EditorCursor name path' }
 
   UpdateEvalResult key result ->
     let evalResults = state.evalResults
         evalResults' = Map.insert key result evalResults
-    in pure $ EditorState $ state { evalResults = evalResults' }
+    in pure $ State $ state { evalResults = evalResults' }
 
 astReducer :: AstAction -> Cursor -> Ast.Expr -> Ast.Expr
 astReducer action cursor expr = case action of

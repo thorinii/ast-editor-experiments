@@ -60,7 +60,6 @@ There is no usage yet.
 
 ## TODO
 
-* Rename EditorState to State
 * Implement more commands
   * Implement literal entry/variable picker asap aka the autocomplete popup
   * All expression types

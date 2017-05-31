@@ -15,7 +15,7 @@ import Data.StrMap (StrMap)
 import Data.String (joinWith)
 import Data.Tuple (Tuple(..))
 import Editor.JobQueue (JobQueue)
-import Editor.State (EditorState)
+import Editor.State (State)
 import Prelude (class Eq, map, not, ($), (>>>))
 
 data StatusLevel = StatusInfo | StatusWarn | StatusError
@@ -47,7 +47,7 @@ newtype StatusLine = StatusLine {
 }
 
 
-status :: EditorState -> StatusLine
+status :: State -> StatusLine
 status state = StatusLine { level: level, message: message }
   where failed = (State.cache >>> failedCompiles) state <>
                  (State.cache >>> failedTests) state
