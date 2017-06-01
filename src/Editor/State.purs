@@ -1,5 +1,5 @@
 module Editor.State (
-  State(..), EditorCursor(..),
+  State(..), EditorCursor(..), Autocomplete(..),
   Action(..), AstAction(..),
   JobResult(..),
   code, cursor, cache, keyMap,
@@ -20,7 +20,8 @@ newtype State = State {
   cursor :: EditorCursor,
   evalResults :: StrMap (Maybe String),
   cache :: StrMap (StrMap JobResult),
-  keyMap :: KeyMap Action
+  keyMap :: KeyMap Action,
+  autocomplete :: Maybe Autocomplete
 }
 
 newtype JobResult = JobResult {
@@ -33,6 +34,7 @@ data Action = ImportAstAction String Expr
             | AstAction AstAction
             | CursorAction Int
             | UpdateEvalResult String (Maybe String)
+            | UpdateAutocompleteAction (Maybe Autocomplete)
 
 data AstAction = ApplySelected
                | ApplyWithSelected
@@ -40,6 +42,9 @@ data AstAction = ApplySelected
                | WrapInLambda
                | WrapInBinary String
                | WrapInPattern
+               | ReplaceValue String
+
+newtype Autocomplete = Autocomplete { value :: String }
 
 
 code :: State -> StrMap Expr

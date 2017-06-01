@@ -72,7 +72,7 @@ findCursors ast = case ast of
     let arg' = prepend ArgTarget (findCursors arg)
         caseMap idx (PatternCase _ e) = prepend (IndexedTarget idx) (prepend ValueTarget (findCursors e))
         cases' = concat (mapWithIndex caseMap cases)
-    in cases' <> arg'
+    in arg' <> cases'
 
 
 nextAdjacentLeaf :: Expr -> Maybe Cursor -> Int -> Maybe Cursor

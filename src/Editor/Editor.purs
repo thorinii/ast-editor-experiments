@@ -2,15 +2,15 @@ module Editor.Editor (
   Editor,
   create,
   setListener,
-  showAst, dispatchKey
+  showAst, dispatchKey, updatedAutocomplete
 ) where
 
+import Control.Monad.Eff.Console as Eff
 import Editor.Core as Core
 import Editor.JobExecutor as JobExecutor
 import Editor.KeyMap as KeyMap
 import Editor.Listener as Listener
 import Editor.State as State
-import Editor.State (State)
 import Editor.Threading as Threading
 import Control.Monad.Aff (Aff)
 import Control.Monad.Aff.AVar (AVAR, AVar)
@@ -22,13 +22,14 @@ import Control.Monad.Eff.Ref (REF)
 import Control.Monad.State (StateT, get, lift, modify, put, runStateT)
 import Control.Monad.Writer (WriterT, execWriterT)
 import Data.Array (concatMap)
-import Data.Maybe (Maybe(..), maybe)
+import Data.Maybe (Maybe(..), isJust, maybe)
 import Data.Traversable (for_)
 import Editor.Event (Event(..))
 import Editor.Job (Job(..))
 import Editor.Listener (Listener)
+import Editor.State (Autocomplete(..), State)
 import Model.Ast (Expr)
-import Prelude (Unit, bind, discard, map, pure, show, unit, ($), (<>))
+import Prelude (Unit, bind, discard, map, pure, show, unit, ($), (<>), (==))
 
 data Editor = Editor (AVar Job) (AVar Event)
 
@@ -62,6 +63,9 @@ showAst ast = dispatchEvent (ImportAstEvent ast)
 
 dispatchKey :: forall e. KeyMap.KeyBinding -> Editor -> Eff (ref :: REF, avar :: AVAR | e) Unit
 dispatchKey key = dispatchEvent (KeyEvent key)
+
+updatedAutocomplete :: forall e. String -> Editor -> Eff (avar :: AVAR, console :: CONSOLE | e) Unit
+updatedAutocomplete value = dispatchEvent (AutocompleteUpdatedEvent value)
 
 dispatchEvent :: forall e. Event -> Editor -> Eff (avar :: AVAR | e) Unit
 dispatchEvent ev (Editor _ eventQueue) = Threading.putQueue' eventQueue ev
@@ -97,11 +101,24 @@ handleEvent event = do
   case event of
     ImportAstEvent ast ->
       reduce $ State.ImportAstAction "main" ast
-    KeyEvent key ->
-      let actionM = KeyMap.getAction key keyMap
-      in maybe (pure unit)
-               (\(KeyMap.KeyAction { action }) -> reduce action)
-               actionM
+    KeyEvent key -> do
+      let (State.State { autocomplete }) = state
+      case autocomplete of
+        Just (Autocomplete a) -> do
+          case key of
+            k | k == KeyMap.escape -> reduce $ State.UpdateAutocompleteAction Nothing
+            k | k == KeyMap.enter -> do
+              reduce $ State.AstAction $ State.ReplaceValue a.value
+              reduce $ State.UpdateAutocompleteAction Nothing
+            _ -> pure unit
+        _ -> do
+          let actionM = KeyMap.getAction key keyMap
+          maybe (pure unit)
+                (\(KeyMap.KeyAction { action }) -> reduce action)
+                actionM
     EvaluatedEvent key result -> reduce $ State.UpdateEvalResult key result
     SetListener listener ->
       modify (\es -> es { listener = Just listener })
+
+    AutocompleteUpdatedEvent value -> do
+      reduce $ State.UpdateAutocompleteAction (Just $ Autocomplete { value })

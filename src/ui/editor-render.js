@@ -43,11 +43,36 @@ const TestJsView = props => {
   return e('div', {className: 'code-text'}, render)
 }
 
+const AutocompletePopupView = props => {
+  if (!props.visible) return e('div')
+  return e('div',
+    {className: 'autocomplete'},
+    e('input', {
+      type: 'text',
+      autoFocus: true,
+      value: props.value,
+      onInput: e => {
+        props.editor.updatedAutocomplete(e.target.value)
+      },
+      onBlur: () => {
+        // props.editor.
+      }
+    }))
+}
+
 module.exports = {
   editor: props => {
     const state = props.state
+    const editor = props.editor
 
-    const pane = e('div', {className: 'pane'}, e(AstView, {ast: state.code['main'], cursor: state.cursor.value1}))
+    const pane = e(
+      'div',
+      {className: 'pane'},
+      e(AutocompletePopupView, {
+        visible: !!state.autocomplete.value0,
+        value: state.autocomplete.value0 && state.autocomplete.value0.value,
+        editor: editor}),
+      e(AstView, {ast: state.code['main'], cursor: state.cursor.value1}))
 
     const sidebar = e('div', {className: 'sidebar'},
       Components['pane\'']('state pane-noseparator')(

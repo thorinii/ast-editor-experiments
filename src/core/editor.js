@@ -22,5 +22,8 @@ Editor.prototype.showAst = function (ast) {
 Editor.prototype.dispatchKey = function (key) {
   _Editor.dispatchKey(key)(this._e)()
 }
+Editor.prototype.updatedAutocomplete = function (value) {
+  _Editor.updatedAutocomplete(value)(this._e)()
+}
 
 module.exports.createEditor = createEditor

@@ -148,3 +148,19 @@ key {
 .editor .message.error {
   background-color: #8d1e1e;
 }
+
+
+.pane {
+  position: relative;
+}
+
+.autocomplete {
+  position: absolute;
+  top: 50%;
+  left: calc(50% - 500px / 2);
+  width: 500px;
+}
+
+.autocomplete > input {
+  width: 100%;
+}

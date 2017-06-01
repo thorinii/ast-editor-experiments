@@ -15,6 +15,7 @@ import Model.Cursor as Cursor
 import Control.Monad.Writer (class MonadTell, tell)
 import Data.Foldable (foldl)
 import Data.Maybe (Maybe(..), maybe)
+import Data.String (charAt)
 import Model.Ast.Operators (binaryWrapper, lambdaWrapper, patternWrapper)
 import Model.Cursor (Cursor)
 import Prelude (class Show, Unit, bind, discard, flip, id, pure, ($), (<<<))
@@ -34,7 +35,8 @@ initialState = State {
   cursor: EditorCursor "main" Nothing,
   evalResults: Map.empty,
   cache: Map.empty,
-  keyMap: foldl (flip KeyMap.addKeyBindingAction) KeyMap.empty DKB.bindings
+  keyMap: foldl (flip KeyMap.addKeyBindingAction) KeyMap.empty DKB.bindings,
+  autocomplete: Nothing
 }
 
 pushTopLevelDiff :: forall m. MonadEditor m => String -> m Unit
@@ -64,6 +66,9 @@ reducer action (State state) = case action of
         evalResults' = Map.insert key result evalResults
     in pure $ State $ state { evalResults = evalResults' }
 
+  UpdateAutocompleteAction autocompleteM ->
+    pure $ State $ state { autocomplete = autocompleteM }
+
 astReducer :: AstAction -> Cursor -> Ast.Expr -> Ast.Expr
 astReducer action cursor expr = case action of
   ApplySelected -> Ops.wrap Ops.applyFnWrapper cursor expr
@@ -72,3 +77,6 @@ astReducer action cursor expr = case action of
   WrapInLambda -> Ops.wrap lambdaWrapper cursor expr
   WrapInBinary op -> Ops.wrap (binaryWrapper op) cursor expr
   WrapInPattern -> Ops.wrap patternWrapper cursor expr
+  ReplaceValue value ->
+    -- TODO: parse String, Number, Variable
+    Ops.replace (Ast.Literal $ Ast.LiteralString value) cursor expr

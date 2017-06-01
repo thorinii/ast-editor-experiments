@@ -52,36 +52,40 @@ function EditorUI (editor, el) {
   this._el = el
 
   this._editor.setListener(state => this._render(state))
-}
 
-EditorUI.prototype._render = function (state) {
-  const el = this._el
-  const keyMap = state.keyMap
-
-  ReactDOM.render(
-    React.createElement(EditorRender.editor, {
-      state: state,
-      keyMap: keyMap
-    }),
-    el)
-
-  const keyListener = ev => {
+  this._captureKeys = true
+  this._keyListener = ev => {
     try {
       const translatedEvent = translateKeyEvent(ev)
       const key = translatedEvent.string
 
       if (!KeyMap.isPassthrough(key)) {
         this._editor.dispatchKey(key)
-        ev.preventDefault()
+        if (this._captureKeys) ev.preventDefault()
       }
     } catch (e) {
       console.error(e)
-      ev.preventDefault()
+      if (this._captureKeys) ev.preventDefault()
     }
   }
+}
+
+EditorUI.prototype._render = function (state) {
+  const el = this._el
+  const keyMap = state.keyMap
+  this._captureKeys = !state.autocomplete.value0
+
+  ReactDOM.render(
+    React.createElement(EditorRender.editor, {
+      state: state,
+      keyMap: keyMap,
+      editor: this._editor
+    }),
+    el)
+
   const bodyEl = document.querySelector('body')
   if (!bodyEl.classList.contains('key-listener')) {
-    bodyEl.addEventListener('keypress', keyListener, false)
+    bodyEl.addEventListener('keypress', this._keyListener, false)
     bodyEl.classList.add('key-listener')
   }
 }

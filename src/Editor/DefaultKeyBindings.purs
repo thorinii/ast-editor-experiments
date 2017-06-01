@@ -2,8 +2,9 @@ module Editor.DefaultKeyBindings (
   bindings
 ) where
 
+import Data.Maybe (Maybe(..))
 import Editor.KeyMap (KeyBindingAction, bindToAction, makeAction)
-import Editor.State (Action(..), AstAction(..))
+import Editor.State (Action(..), AstAction(..), Autocomplete(..))
 import Prelude (negate, ($))
 
 bindings :: Array (KeyBindingAction Action)
@@ -29,6 +30,10 @@ bindings = [
   bindToAction "-" $
     makeAction (AstAction (WrapInBinary "-"))
       "Wrap the current expression in a binary -",
+
+  bindToAction "c" $
+    makeAction (UpdateAutocompleteAction (Just $ Autocomplete { value: "" }))
+      "Edit the current literal/variable",
 
   bindToAction "<left>" $
     makeAction (CursorAction (-1))

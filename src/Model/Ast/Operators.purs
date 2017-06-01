@@ -1,5 +1,5 @@
 module Model.Ast.Operators (
-  wrap,
+  wrap, replace,
   applyFnWrapper, applyToWrapper, letWrapper, lambdaWrapper,
   binaryWrapper, patternWrapper
 ) where
@@ -13,6 +13,9 @@ type Wrapper = Expr -> Expr
 
 wrap :: Wrapper -> Cursor -> Expr -> Expr
 wrap = rewriteAt
+
+replace :: Expr -> Cursor -> Expr -> Expr
+replace e = wrap (\_ -> e)
 
 
 wrapApplyFn :: Cursor -> Expr -> Expr

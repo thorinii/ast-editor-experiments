@@ -5,7 +5,8 @@ module Editor.KeyMap (
   addBinding, addKeyBindingAction,
   getAction,
   getBindings,
-  makeAction, bindToAction
+  makeAction, bindToAction,
+  escape, enter
 ) where
 
 import Data.StrMap as StrMap
@@ -23,6 +24,11 @@ newtype KeyMap a = KeyMap { bindings :: Array (KeyBindingAction a), actions :: S
 derive instance genericKeyBinding :: Generic KeyBinding
 instance eqKeyBinding :: Eq KeyBinding where
   eq = gEq
+
+escape :: KeyBinding
+escape = KeyBinding "<escape>"
+enter :: KeyBinding
+enter = KeyBinding "<enter>"
 
 passthrough :: Array KeyBinding
 passthrough = map KeyBinding [
